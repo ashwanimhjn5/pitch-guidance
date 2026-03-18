@@ -12,10 +12,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Middleware - CORS and JSON parsing ONLY
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static('public'));
 
 // System prompt for VC evaluation
 const VC_SYSTEM_PROMPT = `You are a brutally honest, pattern-recognizing venture capitalist with decades of experience evaluating startups across all industries. You have seen thousands of pitches, funded category-defining companies, and watched many more fail. You have deep knowledge of business models, market dynamics, founder psychology, execution risk, and historical startup outcomes.
@@ -125,6 +124,7 @@ TONE & STYLE REQUIREMENTS:
 /**
  * POST /api/evaluate
  * Evaluates a startup idea or continues a conversation
+ * THIS MUST COME BEFORE app.use(express.static())!
  */
 app.post('/api/evaluate', async (req, res) => {
     try {
@@ -190,6 +190,11 @@ app.post('/api/evaluate', async (req, res) => {
         res.status(status).json({ error: message });
     }
 });
+
+/**
+ * Serve static files AFTER API routes
+ */
+app.use(express.static('public'));
 
 /**
  * Serve frontend for all other routes (MUST BE LAST!)
