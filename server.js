@@ -130,17 +130,33 @@ app.post('/api/evaluate', async (req, res) => {
     try {
         const { idea, conversationHistory } = req.body;
 
+        console.log('📨 Received request:', { 
+            hasIdea: !!idea, 
+            hasHistory: !!conversationHistory,
+            ideaLength: idea?.length || 0
+        });
+
         // Validation
         if (!idea && !conversationHistory) {
+            console.log('❌ Validation failed: no idea or history');
             return res.status(400).json({ 
                 error: 'Either idea or conversationHistory is required' 
             });
         }
 
         // Build messages array
-        const messages = conversationHistory || [
-            { role: 'user', content: `${VC_SYSTEM_PROMPT}\n\n"${idea}"` }
-        ];
+        let messages;
+        if (conversationHistory && conversationHistory.length > 0) {
+            messages = conversationHistory;
+            console.log('💬 Using conversation history with', conversationHistory.length, 'messages');
+        } else {
+            messages = [
+                { role: 'user', content: `${VC_SYSTEM_PROMPT}\n\n"${idea}"` }
+            ];
+            console.log('🆕 Creating new conversation');
+        }
+
+        console.log('🤖 Calling Anthropic API...');
 
         // Call Anthropic API
         const response = await axios.post(
@@ -160,21 +176,23 @@ app.post('/api/evaluate', async (req, res) => {
             }
         );
 
+        console.log('✅ API call successful');
         res.json(response.data);
 
     } catch (error) {
-        console.error('API Error:', error.response?.data || error.message);
+        console.error('❌ API Error:', error.response?.data || error.message);
         
         // Handle specific error types
         const status = error.response?.status || 500;
-        const message = error.response?.data?.error?.message || 'Failed to analyze idea';
+        const message = error.response?.data?.error?.message || error.message || 'Failed to analyze idea';
         
+        console.error('Returning error:', { status, message });
         res.status(status).json({ error: message });
     }
 });
 
 /**
- * Serve frontend for all other routes
+ * Serve frontend for all other routes (MUST BE LAST!)
  */
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
