@@ -10,15 +10,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    // Initialize Supabase client
-    const SUPABASE_URL = 'https://hhsnpgmsoktjqvyyryfy.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc25wZ21zb2t0anF2eXlyeWZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTEzMTQsImV4cCI6MjA4OTQyNzMxNH0.99FBDZeJaxehvfTXUn94NMhT72HXOuX2ulj52sB7rLU';
+    // Make Supabase config globally available
+    window.SUPABASE_URL = 'https://hhsnpgmsoktjqvyyryfy.supabase.co';
+    window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc25wZ21zb2t0anF2eXlyeWZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTEzMTQsImV4cCI6MjA4OTQyNzMxNH0.99FBDZeJaxehvfTXUn94NMhT72HXOuX2ulj52sB7rLU';
     
-    // Wait for Supabase to load, then create client
-    let supabase;
-    if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
+    // Helper to get Supabase client
+    window.getSupabase = function() {
+        if (!window._supabaseClient && window.supabase) {
+            window._supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+        }
+        return window._supabaseClient;
+    };
 
     window.showAuthModal = function(mode) {
         const modal = document.getElementById('authModal');
@@ -57,11 +59,7 @@
     
     window.loginWithGoogle = async function() {
         try {
-            // Make sure supabase is initialized
-            if (!supabase && window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-            
+            const supabase = window.getSupabase();
             if (!supabase) {
                 throw new Error('Supabase not initialized');
             }
@@ -81,7 +79,6 @@
         }
     };
 </script>
-
     
     <style>
     <style>
@@ -1914,13 +1911,9 @@
         // === END CRITICAL FIX ===
 
         // Initialize Supabase - THIS WILL BE CONFIGURED FROM ENV VARS
-        const SUPABASE_URL = 'https://hhsnpgmsoktjqvyyryfy.supabase.co'; // Will be replaced
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc25wZ21zb2t0anF2eXlyeWZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTEzMTQsImV4cCI6MjA4OTQyNzMxNH0.99FBDZeJaxehvfTXUn94NMhT72HXOuX2ulj52sB7rLU'; // Will be replaced
-        
+        const supabase = window.getSupabase();
         // Note: These will be injected at build time or you'll need to configure them
-        // For now, we'll add them as script configuration
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
+        // For now, we'll add them as script configuration        
         let currentUser = null;
         let currentIdeaId = null;
         let currentEvaluationId = null;
