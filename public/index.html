@@ -2259,22 +2259,6 @@
         
         // Progressive loading animation
 
-        async function loginWithGoogle() {
-    try {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: 'https://pitch-guidance.vercel.app'
-            }
-        });
-        
-        if (error) throw error;
-        
-    } catch (error) {
-        console.error('Google login error:', error);
-        alert('Failed to login with Google: ' + error.message);
-    }
-}
         function startLoadingAnimation() {
             const steps = document.querySelectorAll('.loading-step');
             let currentStep = 0;
