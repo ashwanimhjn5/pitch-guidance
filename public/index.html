@@ -8,6 +8,46 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- CRITICAL: Load auth functions in HEAD -->
+    <script>
+    window.showAuthModal = function(mode) {
+        const modal = document.getElementById('authModal');
+        if (modal) {
+            modal.classList.add('show');
+            if (mode === 'login') {
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('signupForm').style.display = 'none';
+            } else {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('signupForm').style.display = 'block';
+            }
+        }
+    };
+    
+    window.closeAuthModal = function() {
+        const modal = document.getElementById('authModal');
+        if (modal) modal.classList.remove('show');
+    };
+    
+    window.showHome = function() {
+        document.getElementById('dashboardView')?.classList.remove('active');
+        document.getElementById('mainContent')?.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    window.switchToLogin = function() {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('signupForm').style.display = 'none';
+    };
+    
+    window.switchToSignup = function() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('signupForm').style.display = 'block';
+    };
+    </script>
+    
+    <style>
     <style>
         * {
             margin: 0;
