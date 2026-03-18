@@ -1,6 +1,6 @@
 /**
- * Ruthless VC - Server
- * A brutally honest startup evaluation tool powered by Claude AI
+ * Pitch Guidance - Server with Supabase Auth
+ * A thoughtful startup evaluation tool powered by Claude AI
  */
 
 require('dotenv').config();
@@ -8,24 +8,64 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Initialize Supabase client
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+);
+
+// Middleware - CORS and JSON parsing ONLY
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static('public'));
 
-// System prompt for VC evaluation
-const VC_SYSTEM_PROMPT = `You are a brutally honest, pattern-recognizing venture capitalist with decades of experience evaluating startups across all industries. You have seen thousands of pitches, funded category-defining companies, and watched many more fail. You have deep knowledge of business models, market dynamics, founder psychology, execution risk, and historical startup outcomes.
+// Auth middleware - verify JWT token
+async function authenticateUser(req, res, next) {
+    try {
+        const authHeader = req.headers.authorization;
+        
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'No authorization token provided' });
+        }
 
-Analyze this business idea with extreme thoroughness:
+        const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+        
+        // Verify the token with Supabase
+        const { data: { user }, error } = await supabase.auth.getUser(token);
+        
+        if (error || !user) {
+            return res.status(401).json({ error: 'Invalid or expired token' });
+        }
 
-Provide a comprehensive evaluation following this structure:
+        // Attach user to request object
+        req.user = user;
+        next();
+    } catch (error) {
+        console.error('Auth error:', error);
+        res.status(401).json({ error: 'Authentication failed' });
+    }
+}
+
+// System prompt for startup evaluation
+const EVALUATION_PROMPT = `You are an experienced startup advisor and investor with decades of experience evaluating business ideas across all industries. You've helped countless founders refine their ideas, identify opportunities, and avoid common pitfalls. You provide honest, constructive feedback that helps founders make better decisions.
+
+Your approach is:
+- Supportive yet candid - you want founders to succeed
+- Analytical and thorough - you identify both strengths and risks
+- Balanced - you highlight what's working AND what needs work
+- Actionable - your feedback helps founders know what to do next
+- Evidence-based - you reference real companies, market data, and patterns
+
+Analyze this business idea comprehensively:
+
+Provide your evaluation following this structure:
 
 ## 1. RESTATEMENT OF THE IDEA
-Summarize the idea concisely and structured. Identify: core problem, target user, proposed solution, and wedge strategy.
+Summarize the idea concisely. Identify: core problem, target user, proposed solution, and go-to-market strategy.
 
 ## 2. USE CASE EVALUATION
 - What real problem is being solved
@@ -36,7 +76,7 @@ Summarize the idea concisely and structured. Identify: core problem, target user
 ## 3. VALUE PROPOSITION ANALYSIS
 - What is the core value delivered
 - Why would users switch from current solutions
-- What is 10x better vs incremental
+- What's differentiated vs incremental
 - Current alternatives users have
 
 ## 4. MARKET & OPPORTUNITY
@@ -76,11 +116,11 @@ Summarize the idea concisely and structured. Identify: core problem, target user
 ## 10. WHY THIS MIGHT FAIL
 - List top 5-7 risks (market, product, timing, behavior, structural)
 - Where most founders underestimate difficulty
-- What could kill this even with good execution
+- What could derail this even with good execution
 
 ## 11. WHY THIS MIGHT SUCCEED
 - Tailwinds (tech, regulation, behavior shifts)
-- Unique wedge or non-obvious insight
+- Unique advantages or non-obvious insights
 - Specific conditions under which this becomes big
 
 ## 12. MOAT & DEFENSIBILITY
@@ -93,54 +133,77 @@ Summarize the idea concisely and structured. Identify: core problem, target user
 - Scalable growth channels after that
 - CAC estimates and distribution risks
 
-## 14. HONEST VERDICT
-Give a clear investment decision:
-- PASS / WEAK MAYBE / STRONG MAYBE / INVESTABLE / HIGHLY COMPELLING
+## 14. HONEST ASSESSMENT
+Give a clear, balanced assessment:
+- PASS / NEEDS REFINEMENT / PROMISING / STRONG OPPORTUNITY / HIGHLY COMPELLING
 
-Justify with specific reasoning. Include:
-- Why you're skeptical (if applicable)
-- Why you're not completely dismissing it (if applicable)
-- The path to "yes" (what would need to be proven)
+Explain your reasoning:
+- What are the main concerns
+- What shows promise
+- What would need to be proven to get to "yes"
 
 ## 15. IMPROVEMENT SUGGESTIONS
-- 3-4 concrete ways to refine or pivot the idea
-- What would make this significantly stronger
-- Alternative positioning or market approaches
+- 3-4 concrete ways to refine or strengthen the idea
+- What would make this significantly better
+- Alternative positioning or market approaches to consider
 
-## 16. FOLLOW-UP QUESTIONS
-Ask 5-7 sharp, high-leverage questions that would change your evaluation if answered well.
+## 16. KEY QUESTIONS TO EXPLORE
+Ask 5-7 thoughtful questions that would help clarify the opportunity and shape next steps.
 
 ---
 
-TONE & STYLE REQUIREMENTS:
-- Be direct, analytical, and brutally candid
-- Do not sugarcoat or encourage weak ideas
-- Avoid generic advice; use specific reasoning, numbers, and company examples
-- Prioritize clarity, structured thinking, and actionable insight
-- Use real company names, real market data, real patterns
-- Challenge assumptions, especially around market size and willingness to pay
-- If the idea is weak, say so clearly and explain why
-- If the idea is strong, identify the hidden risks everyone misses`;
+TONE GUIDELINES:
+- Be direct and honest, but constructive and supportive
+- Assume the founder is smart and capable
+- Focus on helping them build something great
+- Use specific examples, numbers, and company names
+- Challenge assumptions respectfully
+- Celebrate genuine strengths while flagging real risks
+- If the idea needs work, explain why AND suggest how to improve it
+- If the idea is strong, identify the hidden challenges most founders miss`;
+
+// ============================================
+// API ENDPOINTS
+// ============================================
 
 /**
  * POST /api/evaluate
- * Evaluates a startup idea or continues a conversation
+ * Evaluates a startup idea (can be used with or without auth)
+ * If authenticated, can save the evaluation
  */
 app.post('/api/evaluate', async (req, res) => {
     try {
-        const { idea, conversationHistory } = req.body;
+        const { idea, conversationHistory, saveEvaluation, ideaId } = req.body;
+
+        console.log('📨 Received request:', { 
+            hasIdea: !!idea, 
+            hasHistory: !!conversationHistory,
+            ideaLength: idea?.length || 0,
+            saveEvaluation,
+            ideaId
+        });
 
         // Validation
         if (!idea && !conversationHistory) {
+            console.log('❌ Validation failed: no idea or history');
             return res.status(400).json({ 
                 error: 'Either idea or conversationHistory is required' 
             });
         }
 
         // Build messages array
-        const messages = conversationHistory || [
-            { role: 'user', content: `${VC_SYSTEM_PROMPT}\n\n"${idea}"` }
-        ];
+        let messages;
+        if (conversationHistory && conversationHistory.length > 0) {
+            messages = conversationHistory;
+            console.log('💬 Using conversation history with', conversationHistory.length, 'messages');
+        } else {
+            messages = [
+                { role: 'user', content: `${EVALUATION_PROMPT}\n\n"${idea}"` }
+            ];
+            console.log('🆕 Creating new conversation');
+        }
+
+        console.log('🤖 Calling Anthropic API...');
 
         // Call Anthropic API
         const response = await axios.post(
@@ -160,21 +223,247 @@ app.post('/api/evaluate', async (req, res) => {
             }
         );
 
+        console.log('✅ API call successful');
+
+        // If user wants to save and provided auth token, save to database
+        if (saveEvaluation && req.headers.authorization) {
+            try {
+                const token = req.headers.authorization.substring(7);
+                const { data: { user } } = await supabase.auth.getUser(token);
+                
+                if (user && ideaId) {
+                    const evaluationText = response.data.content.find(item => item.type === "text")?.text || "";
+                    
+                    // Extract metadata
+                    const verdictMatch = evaluationText.match(/(?:PASS|NEEDS REFINEMENT|PROMISING|STRONG OPPORTUNITY|HIGHLY COMPELLING)/i);
+                    const verdict = verdictMatch ? verdictMatch[0] : null;
+                    
+                    const tamMatch = evaluationText.match(/TAM[:\s]+.*?(\$[\d.]+[BMK])/i);
+                    const marketSize = tamMatch ? tamMatch[1] : null;
+                    
+                    // Save evaluation
+                    const { data: evaluation, error: evalError } = await supabase
+                        .from('evaluations')
+                        .insert({
+                            idea_id: ideaId,
+                            user_id: user.id,
+                            evaluation_text: evaluationText,
+                            verdict,
+                            market_size: marketSize
+                        })
+                        .select()
+                        .single();
+                    
+                    if (!evalError && evaluation) {
+                        response.data.evaluationId = evaluation.id;
+                        console.log('💾 Evaluation saved:', evaluation.id);
+                    }
+                }
+            } catch (saveError) {
+                console.error('Failed to save evaluation:', saveError);
+                // Don't fail the request if save fails
+            }
+        }
+
         res.json(response.data);
 
     } catch (error) {
-        console.error('API Error:', error.response?.data || error.message);
+        console.error('❌ API Error:', error.response?.data || error.message);
         
-        // Handle specific error types
         const status = error.response?.status || 500;
-        const message = error.response?.data?.error?.message || 'Failed to analyze idea';
+        const message = error.response?.data?.error?.message || error.message || 'Failed to analyze idea';
         
+        console.error('Returning error:', { status, message });
         res.status(status).json({ error: message });
     }
 });
 
 /**
- * Serve frontend for all other routes
+ * POST /api/ideas
+ * Create a new idea (requires auth)
+ */
+app.post('/api/ideas', authenticateUser, async (req, res) => {
+    try {
+        const { title, description } = req.body;
+
+        if (!title || !description) {
+            return res.status(400).json({ error: 'Title and description are required' });
+        }
+
+        const { data, error } = await supabase
+            .from('ideas')
+            .insert({
+                user_id: req.user.id,
+                title: title.substring(0, 500), // Limit title length
+                description
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(500).json({ error: 'Failed to save idea' });
+        }
+
+        console.log('💡 New idea created:', data.id);
+        res.json(data);
+
+    } catch (error) {
+        console.error('Error creating idea:', error);
+        res.status(500).json({ error: 'Failed to create idea' });
+    }
+});
+
+/**
+ * GET /api/ideas
+ * Get all ideas for the authenticated user
+ */
+app.get('/api/ideas', authenticateUser, async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('ideas')
+            .select(`
+                *,
+                evaluations (
+                    id,
+                    verdict,
+                    market_size,
+                    created_at
+                )
+            `)
+            .eq('user_id', req.user.id)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(500).json({ error: 'Failed to fetch ideas' });
+        }
+
+        console.log(`📚 Retrieved ${data.length} ideas for user`);
+        res.json(data);
+
+    } catch (error) {
+        console.error('Error fetching ideas:', error);
+        res.status(500).json({ error: 'Failed to fetch ideas' });
+    }
+});
+
+/**
+ * GET /api/ideas/:id
+ * Get a specific idea with its evaluation
+ */
+app.get('/api/ideas/:id', authenticateUser, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const { data, error } = await supabase
+            .from('ideas')
+            .select(`
+                *,
+                evaluations (
+                    id,
+                    evaluation_text,
+                    verdict,
+                    market_size,
+                    primary_risk,
+                    created_at,
+                    conversation_history (
+                        id,
+                        role,
+                        content,
+                        created_at
+                    )
+                )
+            `)
+            .eq('id', id)
+            .eq('user_id', req.user.id)
+            .single();
+
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(404).json({ error: 'Idea not found' });
+        }
+
+        console.log('📖 Retrieved idea:', id);
+        res.json(data);
+
+    } catch (error) {
+        console.error('Error fetching idea:', error);
+        res.status(500).json({ error: 'Failed to fetch idea' });
+    }
+});
+
+/**
+ * DELETE /api/ideas/:id
+ * Delete an idea and all its evaluations
+ */
+app.delete('/api/ideas/:id', authenticateUser, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const { error } = await supabase
+            .from('ideas')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', req.user.id);
+
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(500).json({ error: 'Failed to delete idea' });
+        }
+
+        console.log('🗑️ Deleted idea:', id);
+        res.json({ success: true });
+
+    } catch (error) {
+        console.error('Error deleting idea:', error);
+        res.status(500).json({ error: 'Failed to delete idea' });
+    }
+});
+
+/**
+ * POST /api/conversation
+ * Save a conversation message (requires auth)
+ */
+app.post('/api/conversation', authenticateUser, async (req, res) => {
+    try {
+        const { evaluationId, role, content } = req.body;
+
+        if (!evaluationId || !role || !content) {
+            return res.status(400).json({ error: 'evaluationId, role, and content are required' });
+        }
+
+        const { data, error } = await supabase
+            .from('conversation_history')
+            .insert({
+                evaluation_id: evaluationId,
+                user_id: req.user.id,
+                role,
+                content
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(500).json({ error: 'Failed to save conversation' });
+        }
+
+        res.json(data);
+
+    } catch (error) {
+        console.error('Error saving conversation:', error);
+        res.status(500).json({ error: 'Failed to save conversation' });
+    }
+});
+
+/**
+ * Serve static files AFTER API routes
+ */
+app.use(express.static('public'));
+
+/**
+ * Serve frontend for all other routes (MUST BE LAST!)
  */
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -188,12 +477,13 @@ const startServer = (port) => {
         console.log(`
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
-║              🔥 RUTHLESS VC 🔥                        ║
+║            💡 PITCH GUIDANCE 💡                       ║
 ║                                                       ║
 ║  Server running at: http://localhost:${port}          ║
 ║                                                       ║
-║  API key is secure on the server ✓                   ║
-║  Ready to brutally evaluate startup ideas            ║
+║  ✓ API key is secure on the server                   ║
+║  ✓ Supabase connected                                ║
+║  ✓ Ready to help founders build better               ║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
         `);
