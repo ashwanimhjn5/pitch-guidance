@@ -70,6 +70,55 @@
                     redirectTo: 'https://pitch-guidance.vercel.app'
                 }
             });
+
+            // Add this NEW function to handle auth state changes:
+window.handleAuthStateChange = async function() {
+    const supabase = window.getSupabase();
+    if (!supabase) return;
+    
+    // Check if user just logged in (from URL params after OAuth redirect)
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session && session.user) {
+        window.currentUser = session.user;
+        updateUIForAuthState(true);
+        closeAuthModal();
+        
+        // Clean up the URL (remove OAuth params)
+        if (window.location.hash.includes('access_token')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+};
+
+// Call it when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.handleAuthStateChange);
+} else {
+    window.handleAuthStateChange();
+}
+
+            window.updateUIForAuthState = function(isLoggedIn) {
+    const loginBtn = document.getElementById('navLogin');
+    const dashboardLink = document.getElementById('navDashboard');
+    const userMenu = document.getElementById('userMenu');
+    
+    if (isLoggedIn && window.currentUser) {
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (dashboardLink) dashboardLink.style.display = 'block';
+        if (userMenu) userMenu.style.display = 'block';
+        
+        // Set user initials
+        const email = window.currentUser.email || '';
+        const initials = email.substring(0, 2).toUpperCase();
+        const userInitials = document.getElementById('userInitials');
+        if (userInitials) userInitials.textContent = initials;
+    } else {
+        if (loginBtn) loginBtn.style.display = 'block';
+        if (dashboardLink) dashboardLink.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'none';
+    }
+};
             
             if (error) throw error;
             
