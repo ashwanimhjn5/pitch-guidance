@@ -1773,6 +1773,45 @@
     </nav>
 
     <script>
+                // Fix for onclick handlers - make functions available immediately
+        window.showAuthModal = function(mode) {
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                modal.classList.add('show');
+                if (mode === 'login') {
+                    document.getElementById('loginForm').style.display = 'block';
+                    document.getElementById('signupForm').style.display = 'none';
+                } else {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('signupForm').style.display = 'block';
+                }
+            }
+        };
+        
+        window.closeAuthModal = function() {
+            const modal = document.getElementById('authModal');
+            if (modal) modal.classList.remove('show');
+        };
+        
+        window.showHome = function() {
+            document.getElementById('dashboardView').classList.remove('active');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('navHome').classList.add('active');
+            document.getElementById('navDashboard').classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        
+        window.showDashboard = async function() {
+            if (!window.currentUser) {
+                window.showAuthModal('login');
+                return;
+            }
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('dashboardView').classList.add('active');
+            document.getElementById('navHome').classList.remove('active');
+            document.getElementById('navDashboard').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
         // Initialize Supabase - THIS WILL BE CONFIGURED FROM ENV VARS
         const SUPABASE_URL = 'https://hhsnpgmsoktjqvyyryfy.supabase.co'; // Will be replaced
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc25wZ21zb2t0anF2eXlyeWZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTEzMTQsImV4cCI6MjA4OTQyNzMxNH0.99FBDZeJaxehvfTXUn94NMhT72HXOuX2ulj52sB7rLU'; // Will be replaced
