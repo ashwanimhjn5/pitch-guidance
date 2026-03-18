@@ -772,69 +772,72 @@
         }
 
         .conversation-item strong {
-            color: var(--gold);
+            color: #FFFFFF;
             display: block;
             margin-bottom: 1.5rem;
-            font-size: 1.3rem;
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-weight: 600;
             padding-bottom: 1rem;
             border-bottom: 2px solid var(--charcoal);
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
+            font-family: 'Inter', sans-serif;
+            font-style: normal;
         }
 
         /* Format answer content in conversation items */
         .answer-content p {
-            line-height: 2;
-            margin-bottom: 1.5rem;
+            line-height: 1.9;
+            margin-bottom: 1.25rem;
             color: var(--silver);
+            font-size: 1.05rem;
         }
 
         .answer-content ul,
         .answer-content ol {
-            margin: 1.5rem 0;
-            padding-left: 2.5rem;
+            margin: 1.25rem 0;
+            padding-left: 2rem;
         }
 
         .answer-content li {
-            line-height: 2;
-            margin-bottom: 1rem;
+            line-height: 1.9;
+            margin-bottom: 0.75rem;
             color: var(--silver);
+            font-size: 1.05rem;
         }
 
         .answer-content li::marker {
             color: var(--gold);
-            font-weight: 700;
+            font-weight: 600;
         }
 
         .answer-content h2,
         .answer-content h3 {
             color: var(--cream);
-            margin: 2.5rem 0 1.5rem 0;
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
+            margin: 2rem 0 1rem 0;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-style: normal;
         }
 
         .answer-content h2 {
-            font-size: 1.8rem;
-            border-left: 4px solid var(--blood-red);
-            padding-left: 1.5rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            border-left: 3px solid var(--blood-red);
+            padding-left: 1rem;
+            color: #FFFFFF;
         }
 
         .answer-content h3 {
-            font-size: 1.4rem;
-            color: var(--gold);
-            font-weight: 600;
+            font-size: 1.1rem;
+            color: #E0E0E0;
+            font-weight: 500;
         }
 
         .answer-content strong {
-            color: var(--gold);
-            font-weight: 700;
+            color: #FFFFFF;
+            font-weight: 600;
         }
 
         .answer-content em {
-            color: var(--blood-red);
+            color: var(--silver);
             font-style: italic;
         }
 
@@ -989,7 +992,7 @@
     <div class="container">
         <section class="hero">
             <h1 class="hero-title">Pitch Guidance</h1>
-            <p class="hero-subtitle">Startup Evaluation</p>
+            <p class="hero-subtitle">Smart Startup Evaluation/p>
             <p class="hero-description">
                 Get comprehensive feedback on your startup idea from decades of VC insights. 
                 We'll help you identify <span class="blood-accent">strengths</span>, spot <span class="blood-accent">risks</span>, 
@@ -1420,104 +1423,148 @@
                 fail: extractSection(text, /(?:##\s*)?10\.\s*WHY THIS MIGHT FAIL/i, /(?:##\s*)?11\.\s*WHY THIS MIGHT SUCCEED/i),
                 succeed: extractSection(text, /(?:##\s*)?11\.\s*WHY THIS MIGHT SUCCEED/i, /(?:##\s*)?12\.\s*MOAT/i),
                 moat: extractSection(text, /(?:##\s*)?12\.\s*MOAT/i, /(?:##\s*)?13\.\s*GO-TO-MARKET/i),
-                gtm: extractSection(text, /(?:##\s*)?13\.\s*GO-TO-MARKET/i, /(?:##\s*)?14\.\s*HONEST VERDICT/i),
-                verdict: extractSection(text, /(?:##\s*)?14\.\s*HONEST VERDICT/i, /(?:##\s*)?15\.\s*IMPROVEMENT/i),
-                improvements: extractSection(text, /(?:##\s*)?15\.\s*IMPROVEMENT/i, /(?:##\s*)?16\.\s*FOLLOW/i),
-                followup: extractSection(text, /(?:##\s*)?16\.\s*FOLLOW/i, null)
+                gtm: extractSection(text, /(?:##\s*)?13\.\s*GO-TO-MARKET/i, /(?:##\s*)?14\.\s*HONEST/i),
+                verdict: extractSection(text, /(?:##\s*)?14\.\s*HONEST/i, /(?:##\s*)?15\.\s*IMPROVEMENT/i),
+                improvements: extractSection(text, /(?:##\s*)?15\.\s*IMPROVEMENT/i, /(?:##\s*)?16\.\s*(?:KEY QUESTIONS|FOLLOW)/i),
+                followup: extractSection(text, /(?:##\s*)?16\.\s*(?:KEY QUESTIONS|FOLLOW)/i, null)
             };
 
             const resultsDiv = document.getElementById('results');
             
-            const restatementDiv = document.createElement('div');
-            restatementDiv.className = 'section';
-            restatementDiv.innerHTML = `
-                <div class="section-header">
-                    <span class="section-icon">📋</span>
-                    <h2>Idea Restatement</h2>
-                </div>
-                <div class="section-content">${formatContent(sections.restatement)}</div>
-            `;
-            resultsDiv.insertBefore(restatementDiv, document.getElementById('useCasesSection'));
+            // Helper function to check if content is meaningful
+            const hasContent = (content) => {
+                if (!content) return false;
+                const formatted = formatContent(content);
+                return formatted && 
+                       !formatted.includes('Analysis not available') && 
+                       formatted.length > 50;
+            };
+
+            // Restatement section (always show if exists)
+            if (hasContent(sections.restatement)) {
+                const restatementDiv = document.createElement('div');
+                restatementDiv.className = 'section';
+                restatementDiv.innerHTML = `
+                    <div class="section-header">
+                        <span class="section-icon">📋</span>
+                        <h2>Idea Restatement</h2>
+                    </div>
+                    <div class="section-content">${formatContent(sections.restatement)}</div>
+                `;
+                resultsDiv.insertBefore(restatementDiv, document.getElementById('useCasesSection'));
+            }
 
             document.getElementById('useCasesContent').innerHTML = formatContent(sections.useCases);
             document.getElementById('valuePropsContent').innerHTML = formatContent(sections.valueProps);
             
-            const marketDiv = document.createElement('div');
-            marketDiv.className = 'section';
-            marketDiv.id = 'marketSection';
-            marketDiv.innerHTML = `
-                <div class="section-header">
-                    <span class="section-icon">📊</span>
-                    <h2>Market & Opportunity</h2>
-                </div>
-                <div class="section-content">${formatContent(sections.market)}</div>
-            `;
-            document.getElementById('valuePropsSection').after(marketDiv);
+            // Market section
+            if (hasContent(sections.market)) {
+                const marketDiv = document.createElement('div');
+                marketDiv.className = 'section';
+                marketDiv.id = 'marketSection';
+                marketDiv.innerHTML = `
+                    <div class="section-header">
+                        <span class="section-icon">📊</span>
+                        <h2>Market & Opportunity</h2>
+                    </div>
+                    <div class="section-content">${formatContent(sections.market)}</div>
+                `;
+                document.getElementById('valuePropsSection').after(marketDiv);
+            }
             
             document.getElementById('similarContent').innerHTML = formatContent(sections.similar);
             document.getElementById('failuresContent').innerHTML = formatContent(sections.failures);
             document.getElementById('downsidesContent').innerHTML = formatContent(sections.businessModel);
             
-            const executionDiv = document.createElement('div');
-            executionDiv.className = 'section';
-            executionDiv.innerHTML = `
-                <div class="section-header">
-                    <span class="section-icon">⚙️</span>
-                    <h2>Execution Complexity</h2>
-                </div>
-                <div class="section-content">${formatContent(sections.execution)}</div>
-            `;
-            document.getElementById('downsidesSection').after(executionDiv);
+            // Execution section
+            if (hasContent(sections.execution)) {
+                const executionDiv = document.createElement('div');
+                executionDiv.className = 'section';
+                executionDiv.innerHTML = `
+                    <div class="section-header">
+                        <span class="section-icon">⚙️</span>
+                        <h2>Execution Complexity</h2>
+                    </div>
+                    <div class="section-content">${formatContent(sections.execution)}</div>
+                `;
+                document.getElementById('downsidesSection').after(executionDiv);
+            }
             
             document.getElementById('skillsContent').innerHTML = formatContent(sections.skills);
             document.getElementById('failContent').innerHTML = formatContent(sections.fail);
             document.getElementById('succeedContent').innerHTML = formatContent(sections.succeed);
             
-            const moatDiv = document.createElement('div');
-            moatDiv.className = 'section';
-            moatDiv.innerHTML = `
-                <div class="section-header">
-                    <span class="section-icon">🏰</span>
-                    <h2>Moat & Defensibility</h2>
-                </div>
-                <div class="section-content">${formatContent(sections.moat)}</div>
-            `;
-            document.getElementById('succeedSection').after(moatDiv);
+            // Moat section
+            if (hasContent(sections.moat)) {
+                const moatDiv = document.createElement('div');
+                moatDiv.className = 'section';
+                moatDiv.innerHTML = `
+                    <div class="section-header">
+                        <span class="section-icon">🏰</span>
+                        <h2>Moat & Defensibility</h2>
+                    </div>
+                    <div class="section-content">${formatContent(sections.moat)}</div>
+                `;
+                document.getElementById('succeedSection').after(moatDiv);
+            }
             
-            const gtmDiv = document.createElement('div');
-            gtmDiv.className = 'section';
-            gtmDiv.innerHTML = `
-                <div class="section-header">
-                    <span class="section-icon">🚀</span>
-                    <h2>Go-To-Market Strategy</h2>
-                </div>
-                <div class="section-content">${formatContent(sections.gtm)}</div>
-            `;
-            moatDiv.after(gtmDiv);
+            // GTM section
+            if (hasContent(sections.gtm)) {
+                const gtmDiv = document.createElement('div');
+                gtmDiv.className = 'section';
+                gtmDiv.innerHTML = `
+                    <div class="section-header">
+                        <span class="section-icon">🚀</span>
+                        <h2>Go-To-Market Strategy</h2>
+                    </div>
+                    <div class="section-content">${formatContent(sections.gtm)}</div>
+                `;
+                const lastMoat = Array.from(resultsDiv.querySelectorAll('.section')).find(
+                    s => s.textContent.includes('Moat & Defensibility')
+                );
+                if (lastMoat) {
+                    lastMoat.after(gtmDiv);
+                } else {
+                    document.getElementById('succeedSection').after(gtmDiv);
+                }
+            }
             
             document.getElementById('verdictContent').innerHTML = formatContent(sections.verdict);
             
-            const improvementsDiv = document.createElement('div');
-            improvementsDiv.className = 'section';
-            improvementsDiv.innerHTML = `
-                <div class="section-header">
-                    <span class="section-icon">💡</span>
-                    <h2>Improvement Suggestions</h2>
-                </div>
-                <div class="section-content">${formatContent(sections.improvements)}</div>
-            `;
-            document.getElementById('verdictSection').after(improvementsDiv);
+            // Improvements section
+            if (hasContent(sections.improvements)) {
+                const improvementsDiv = document.createElement('div');
+                improvementsDiv.className = 'section';
+                improvementsDiv.innerHTML = `
+                    <div class="section-header">
+                        <span class="section-icon">💡</span>
+                        <h2>Improvement Suggestions</h2>
+                    </div>
+                    <div class="section-content">${formatContent(sections.improvements)}</div>
+                `;
+                document.getElementById('verdictSection').after(improvementsDiv);
+            }
             
-            const followupDiv = document.createElement('div');
-            followupDiv.className = 'section';
-            followupDiv.innerHTML = `
-                <div class="section-header">
-                    <span class="section-icon">❓</span>
-                    <h2>Critical Follow-Up Questions</h2>
-                </div>
-                <div class="section-content">${formatContent(sections.followup)}</div>
-            `;
-            improvementsDiv.after(followupDiv);
+            // Follow-up questions section - ONLY show if has meaningful content
+            if (hasContent(sections.followup)) {
+                const followupDiv = document.createElement('div');
+                followupDiv.className = 'section';
+                followupDiv.innerHTML = `
+                    <div class="section-header">
+                        <span class="section-icon">❓</span>
+                        <h2>Key Questions to Explore</h2>
+                    </div>
+                    <div class="section-content">${formatContent(sections.followup)}</div>
+                `;
+                const lastImprovement = Array.from(resultsDiv.querySelectorAll('.section')).find(
+                    s => s.textContent.includes('Improvement Suggestions')
+                );
+                if (lastImprovement) {
+                    lastImprovement.after(followupDiv);
+                } else {
+                    document.getElementById('verdictSection').after(followupDiv);
+                }
+            }
 
             resultsDiv.classList.add('active');
         }
