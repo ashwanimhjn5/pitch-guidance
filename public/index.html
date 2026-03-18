@@ -46,6 +46,22 @@
         document.getElementById('signupForm').style.display = 'block';
     };
     </script>
+    window.loginWithGoogle = async function() {
+    try {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin
+            }
+        });
+        
+        if (error) throw error;
+        
+    } catch (error) {
+        console.error('Google login error:', error);
+        alert('Failed to login with Google: ' + error.message);
+    }
+};
     
     <style>
     <style>
