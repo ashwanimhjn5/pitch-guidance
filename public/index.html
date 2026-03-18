@@ -8,9 +8,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // Initialize Supabase client
+    const SUPABASE_URL = 'https://hhsnpgmsoktjqvyyryfy.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc25wZ21zb2t0anF2eXlyeWZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTEzMTQsImV4cCI6MjA4OTQyNzMxNH0.99FBDZeJaxehvfTXUn94NMhT72HXOuX2ulj52sB7rLU';
     
-    <!-- CRITICAL: Load auth functions in HEAD -->
-    <script>
+    // Wait for Supabase to load, then create client
+    let supabase;
+    if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
     window.showAuthModal = function(mode) {
         const modal = document.getElementById('authModal');
         if (modal) {
@@ -45,23 +54,32 @@
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('signupForm').style.display = 'block';
     };
-
+    
     window.loginWithGoogle = async function() {
-    try {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin
+        try {
+            // Make sure supabase is initialized
+            if (!supabase && window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
-        });
-        
-        if (error) throw error;
-        
-    } catch (error) {
-        console.error('Google login error:', error);
-        alert('Failed to login with Google: ' + error.message);
-    }
-};
+            
+            if (!supabase) {
+                throw new Error('Supabase not initialized');
+            }
+            
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
+            
+            if (error) throw error;
+            
+        } catch (error) {
+            console.error('Google login error:', error);
+            alert('Failed to login with Google: ' + error.message);
+        }
+    };
 </script>
 
     
