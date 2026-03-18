@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruthless VC | Get Brutally Honest Feedback on Your Startup Idea</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blood-red: #C41E3A;
+            --deep-black: #0A0A0A;
+            --off-black: #1A1A1A;
+            --charcoal: #2A2A2A;
+            --silver: #E8E8E8;
+            --gold: #D4AF37;
+            --cream: #F5F5DC;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--deep-black);
+            color: var(--silver);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            animation: grain 8s steps(10) infinite;
+        }
+
+        @keyframes grain {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5%, -10%); }
+            20% { transform: translate(-15%, 5%); }
+            30% { transform: translate(7%, -25%); }
+            40% { transform: translate(-5%, 25%); }
+            50% { transform: translate(-15%, 10%); }
+            60% { transform: translate(15%, 0%); }
+            70% { transform: translate(0%, 15%); }
+            80% { transform: translate(3%, 35%); }
+            90% { transform: translate(-10%, 10%); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 60px 20px;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(196, 30, 58, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+        }
+
+        .hero-title {
+            font-family: 'Baskervville', serif;
+            font-size: clamp(3rem, 12vw, 9rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--cream);
+            margin-bottom: 0.2em;
+            letter-spacing: -0.02em;
+            line-height: 0.95;
+            animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: var(--gold);
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 2em;
+            animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
+        }
+
+        .hero-description {
+            max-width: 600px;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--silver);
+            line-height: 1.8;
+            margin-bottom: 3em;
+            animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s backwards;
+        }
+
+        .blood-accent {
+            color: var(--blood-red);
+            font-weight: 700;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Input Section */
+        .pitch-section {
+            background: var(--off-black);
+            border: 1px solid var(--charcoal);
+            border-radius: 0;
+            padding: clamp(2rem, 5vw, 4rem);
+            margin: 4rem 0;
+            position: relative;
+            animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.6s backwards;
+        }
+
+        .pitch-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--blood-red), var(--gold));
+        }
+
+        .pitch-label {
+            font-family: 'Baskervville', serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-style: italic;
+            color: var(--cream);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .pitch-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 1.5rem;
+            background: var(--deep-black);
+            border: 1px solid var(--charcoal);
+            color: var(--cream);
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.8;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .pitch-input:focus {
+            outline: none;
+            border-color: var(--blood-red);
+            box-shadow: 0 0 0 1px var(--blood-red);
+        }
+
+        .pitch-input::placeholder {
+            color: var(--charcoal);
+        }
+
+        .submit-btn {
+            margin-top: 2rem;
+            padding: 1.25rem 3rem;
+            background: var(--blood-red);
+            color: var(--cream);
+            border: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 0;
+        }
+
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: var(--charcoal);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn:disabled::before {
+            display: none;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 6rem 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .loading.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--charcoal);
+            border-top: 3px solid var(--blood-red);
+            border-radius: 50%;
+            margin: 0 auto 3rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-family: 'Baskervville', serif;
+            font-size: 1.3rem;
+            font-style: italic;
+            color: var(--gold);
+            margin-bottom: 2rem;
+        }
+
+        .loading-steps {
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .loading-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--off-black);
+            border-left: 3px solid var(--charcoal);
+            opacity: 0.3;
+            transition: all 0.5s ease;
+        }
+
+        .loading-step.active {
+            opacity: 1;
+            border-left-color: var(--gold);
+        }
+
+        .loading-step.completed {
+            opacity: 0.6;
+            border-left-color: var(--blood-red);
+        }
+
+        .loading-step-icon {
+            font-size: 1.5rem;
+            min-width: 30px;
+        }
+
+        .loading-step.completed .loading-step-icon::before {
+            content: '✓';
+            color: var(--blood-red);
+        }
+
+        .loading-step.active .loading-step-icon {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .loading-step-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--silver);
+        }
+
+        /* Results */
+        .results {
+            display: none;
+            margin: 4rem 0;
+        }
+
+        .results.active {
+            display: block;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .section {
+            background: var(--off-black);
+            border-left: 4px solid var(--blood-red);
+            padding: clamp(1.5rem, 4vw, 3rem);
+            margin-bottom: 2rem;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.15s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.25s; }
+        .section:nth-child(5) { animation-delay: 0.3s; }
+        .section:nth-child(6) { animation-delay: 0.35s; }
+        .section:nth-child(7) { animation-delay: 0.4s; }
+        .section:nth-child(8) { animation-delay: 0.45s; }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .section:hover {
+            border-left-color: var(--gold);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            font-size: 2rem;
+            filter: grayscale(1);
+        }
+
+        .section h2 {
+            font-family: 'Baskervville', serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--cream);
+            margin: 0;
+        }
+
+        .section-content {
+            color: var(--silver);
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content strong {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .section-content em {
+            color: var(--blood-red);
+            font-style: italic;
+        }
+
+        .section-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .section-content li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            border-bottom: 1px solid var(--charcoal);
+        }
+
+        .section-content li:last-child {
+            border-bottom: none;
+        }
+
+        .section-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--blood-red);
+            font-weight: 700;
+        }
+
+        /* Key Metrics Boxes */
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
+        }
+
+        .metric-card {
+            background: var(--off-black);
+            border: 2px solid var(--charcoal);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--blood-red), var(--gold));
+        }
+
+        .metric-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .metric-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--charcoal);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-family: 'Baskervville', serif;
+            font-size: 2rem;
+            font-style: italic;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-description {
+            font-size: 0.9rem;
+            color: var(--silver);
+            line-height: 1.6;
+        }
+
+        .metric-card.highlight {
+            border-color: var(--blood-red);
+            background: linear-gradient(135deg, var(--off-black), rgba(196, 30, 58, 0.05));
+        }
+
+        .metric-card.highlight .metric-value {
+            color: var(--blood-red);
+            font-size: 2.5rem;
+        }
+
+        /* Floating Table of Contents */
+        .floating-nav {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--off-black);
+            border: 1px solid var(--charcoal);
+            padding: 1.5rem 1rem;
+            max-width: 200px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .floating-nav.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .floating-nav-title {
+            font-family: 'Baskervville', serif;
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .floating-nav-item {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.75rem;
+            color: var(--silver);
+            text-decoration: none;
+            border-left: 2px solid var(--charcoal);
+            margin-bottom: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .floating-nav-item:hover {
+            color: var(--gold);
+            border-left-color: var(--gold);
+            padding-left: 1rem;
+        }
+
+        .floating-nav-item.active {
+            color: var(--blood-red);
+            border-left-color: var(--blood-red);
+            font-weight: 700;
+        }
+
+        @media (max-width: 1200px) {
+            .floating-nav {
+                display: none;
+            }
+        }
+
+        /* Verdict Section */
+        .verdict {
+            background: linear-gradient(135deg, var(--off-black) 0%, var(--deep-black) 100%);
+            border: 2px solid var(--blood-red);
+            padding: clamp(2rem, 5vw, 4rem);
+            margin: 4rem 0;
+            position: relative;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s backwards;
+        }
+
+        .verdict::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--blood-red), var(--gold), var(--blood-red));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .verdict:hover::before {
+            opacity: 0.3;
+        }
+
+        .verdict h2 {
+            font-family: 'Baskervville', serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-style: italic;
+            color: var(--cream);
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 0.02em;
+        }
+
+        .verdict-stamp {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .verdict-decision {
+            display: inline-block;
+            padding: 2rem 3rem;
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 4px solid;
+            transform: rotate(-3deg);
+            position: relative;
+            animation: stampDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes stampDrop {
+            0% {
+                transform: rotate(-3deg) translateY(-100px) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: rotate(-3deg) translateY(10px) scale(1.1);
+            }
+            100% {
+                transform: rotate(-3deg) translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .verdict-decision.pass {
+            color: #ff4444;
+            border-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.3);
+        }
+
+        .verdict-decision.weak-maybe {
+            color: #ffaa00;
+            border-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
+        }
+
+        .verdict-decision.strong-maybe {
+            color: #D4AF37;
+            border-color: #D4AF37;
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .verdict-decision.investable {
+            color: #44ff88;
+            border-color: #44ff88;
+            background: rgba(68, 255, 136, 0.1);
+            box-shadow: 0 0 30px rgba(68, 255, 136, 0.3);
+        }
+
+        .verdict-decision.highly-compelling {
+            color: #00ff88;
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.15);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+            animation: stampDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 0 60px rgba(0, 255, 136, 0.8); }
+        }
+
+        .verdict-content {
+            font-size: 1.1rem;
+            line-height: 2;
+            color: var(--silver);
+        }
+
+        /* Confetti animation for highly compelling */
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--gold);
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+            pointer-events: none;
+        }
+
+        /* Follow-up Section */
+        .follow-up {
+            background: var(--off-black);
+            border: 1px solid var(--charcoal);
+            padding: clamp(2rem, 4vw, 3rem);
+            margin: 4rem 0;
+            text-align: center;
+        }
+
+        .follow-up h3 {
+            font-family: 'Baskervville', serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-style: italic;
+            color: var(--cream);
+            margin-bottom: 2rem;
+        }
+
+        .follow-up-input {
+            width: 100%;
+            max-width: 600px;
+            padding: 1rem 1.5rem;
+            background: var(--deep-black);
+            border: 1px solid var(--charcoal);
+            color: var(--cream);
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .follow-up-input:focus {
+            outline: none;
+            border-color: var(--blood-red);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--gold);
+            color: var(--deep-black);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            padding: 1rem 2rem;
+            background: var(--blood-red);
+            color: var(--cream);
+            border: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold);
+            color: var(--deep-black);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:disabled, .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .conversation-history {
+            margin-top: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .conversation-item {
+            background: var(--deep-black);
+            border-left: 3px solid var(--gold);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .conversation-item strong {
+            color: var(--gold);
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .conversation-item p {
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--charcoal);
+            margin-top: 6rem;
+            color: var(--charcoal);
+            font-size: 0.9rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                min-height: 80vh;
+            }
+
+            .pitch-section {
+                padding: 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--charcoal);
+            z-index: 9998;
+        }
+
+        .scroll-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blood-red), var(--gold));
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-indicator">
+        <div class="scroll-progress" id="scrollProgress"></div>
+    </div>
+
+    <div class="container">
+        <section class="hero">
+            <h1 class="hero-title">Ruthless VC</h1>
+            <p class="hero-subtitle">Brutally Honest Startup Evaluation</p>
+            <p class="hero-description">
+                I've funded unicorns. I've watched billions burn. I've seen <span class="blood-accent">every pitch</span> and know <span class="blood-accent">every pattern</span>. 
+                Pitch me your idea and I'll tell you exactly why it'll fail—or why it might just work.
+            </p>
+        </section>
+
+        <section class="pitch-section">
+            <label class="pitch-label" for="ideaInput">Your Pitch</label>
+            <textarea 
+                id="ideaInput" 
+                class="pitch-input" 
+                placeholder="Describe your business idea in detail. What problem does it solve? Who's your target market? What's your unique approach? Be specific—vague pitches get vague feedback."
+            ></textarea>
+            <button id="evaluateBtn" class="submit-btn">
+                <span>Evaluate My Idea</span>
+            </button>
+        </section>
+
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Analyzing your pitch with decades of VC experience...</p>
+            <div class="loading-steps" id="loadingSteps">
+                <div class="loading-step" data-step="1">
+                    <span class="loading-step-icon">🎯</span>
+                    <span class="loading-step-text">Analyzing use cases and target market</span>
+                </div>
+                <div class="loading-step" data-step="2">
+                    <span class="loading-step-icon">💎</span>
+                    <span class="loading-step-text">Evaluating value proposition</span>
+                </div>
+                <div class="loading-step" data-step="3">
+                    <span class="loading-step-icon">📊</span>
+                    <span class="loading-step-text">Calculating market size (TAM/SAM/SOM)</span>
+                </div>
+                <div class="loading-step" data-step="4">
+                    <span class="loading-step-icon">🏢</span>
+                    <span class="loading-step-text">Researching competitive landscape</span>
+                </div>
+                <div class="loading-step" data-step="5">
+                    <span class="loading-step-icon">💀</span>
+                    <span class="loading-step-text">Pattern matching similar successes & failures</span>
+                </div>
+                <div class="loading-step" data-step="6">
+                    <span class="loading-step-icon">💰</span>
+                    <span class="loading-step-text">Assessing business model viability</span>
+                </div>
+                <div class="loading-step" data-step="7">
+                    <span class="loading-step-icon">⚙️</span>
+                    <span class="loading-step-text">Evaluating execution complexity</span>
+                </div>
+                <div class="loading-step" data-step="8">
+                    <span class="loading-step-icon">⚖️</span>
+                    <span class="loading-step-text">Generating final verdict</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <!-- Key Metrics Overview -->
+            <div class="key-metrics" id="keyMetrics" style="display: none;">
+                <div class="metric-card highlight">
+                    <div class="metric-label">Investment Decision</div>
+                    <div class="metric-value" id="metricVerdict">—</div>
+                    <div class="metric-description">Final recommendation</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Market Size</div>
+                    <div class="metric-value" id="metricMarket">—</div>
+                    <div class="metric-description">TAM estimate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Risk Level</div>
+                    <div class="metric-value" id="metricRisk">—</div>
+                    <div class="metric-description">Primary concern</div>
+                </div>
+            </div>
+
+            <div class="section" id="useCasesSection">
+                <div class="section-header">
+                    <span class="section-icon">🎯</span>
+                    <h2>Use Case Evaluation</h2>
+                </div>
+                <div class="section-content" id="useCasesContent"></div>
+            </div>
+
+            <div class="section" id="valuePropsSection">
+                <div class="section-header">
+                    <span class="section-icon">💎</span>
+                    <h2>Value Proposition</h2>
+                </div>
+                <div class="section-content" id="valuePropsContent"></div>
+            </div>
+
+            <div class="section" id="similarSection">
+                <div class="section-header">
+                    <span class="section-icon">🏢</span>
+                    <h2>Competitive Landscape</h2>
+                </div>
+                <div class="section-content" id="similarContent"></div>
+            </div>
+
+            <div class="section" id="failuresSection">
+                <div class="section-header">
+                    <span class="section-icon">💀</span>
+                    <h2>Historical Patterns</h2>
+                </div>
+                <div class="section-content" id="failuresContent"></div>
+            </div>
+
+            <div class="section" id="downsidesSection">
+                <div class="section-header">
+                    <span class="section-icon">💰</span>
+                    <h2>Business Model Viability</h2>
+                </div>
+                <div class="section-content" id="downsidesContent"></div>
+            </div>
+
+            <div class="section" id="skillsSection">
+                <div class="section-header">
+                    <span class="section-icon">🛠️</span>
+                    <h2>Founder-Market Fit</h2>
+                </div>
+                <div class="section-content" id="skillsContent"></div>
+            </div>
+
+            <div class="section" id="failSection">
+                <div class="section-header">
+                    <span class="section-icon">❌</span>
+                    <h2>Why This Might Fail</h2>
+                </div>
+                <div class="section-content" id="failContent"></div>
+            </div>
+
+            <div class="section" id="succeedSection">
+                <div class="section-header">
+                    <span class="section-icon">✅</span>
+                    <h2>Why This Might Succeed</h2>
+                </div>
+                <div class="section-content" id="succeedContent"></div>
+            </div>
+
+            <div class="verdict" id="verdictSection">
+                <h2>⚖️ The Verdict</h2>
+                <div class="verdict-content" id="verdictContent"></div>
+            </div>
+
+            <div class="follow-up">
+                <h3>Questions? Go Deeper.</h3>
+                <input 
+                    type="text" 
+                    id="followUpInput" 
+                    class="follow-up-input" 
+                    placeholder="Ask me anything about this evaluation..."
+                >
+                <div class="action-buttons">
+                    <button id="askFollowUpBtn" class="btn-primary">Ask Question</button>
+                    <button id="newIdeaBtn" class="btn-secondary">Pitch New Idea</button>
+                </div>
+                <div class="conversation-history" id="conversationHistory"></div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Ruthless VC • Powered by Claude AI</p>
+            <p>Not investment advice. Just pattern recognition and brutal honesty.</p>
+        </footer>
+    </div>
+
+    <!-- Floating Navigation -->
+    <nav class="floating-nav" id="floatingNav">
+        <div class="floating-nav-title">Jump to Section</div>
+        <a href="#useCasesSection" class="floating-nav-item">Use Cases</a>
+        <a href="#valuePropsSection" class="floating-nav-item">Value Prop</a>
+        <a href="#marketSection" class="floating-nav-item">Market Size</a>
+        <a href="#similarSection" class="floating-nav-item">Competitors</a>
+        <a href="#failuresSection" class="floating-nav-item">Patterns</a>
+        <a href="#downsidesSection" class="floating-nav-item">Business Model</a>
+        <a href="#skillsSection" class="floating-nav-item">Founder Fit</a>
+        <a href="#failSection" class="floating-nav-item">Why Fail</a>
+        <a href="#succeedSection" class="floating-nav-item">Why Succeed</a>
+        <a href="#verdictSection" class="floating-nav-item">Verdict</a>
+    </nav>
+
+    <script>
+        let conversationHistory = [];
+        let currentIdea = '';
+        let loadingInterval = null;
+
+        // Progressive loading animation
+        function startLoadingAnimation() {
+            const steps = document.querySelectorAll('.loading-step');
+            let currentStep = 0;
+            
+            loadingInterval = setInterval(() => {
+                if (currentStep > 0) {
+                    steps[currentStep - 1].classList.remove('active');
+                    steps[currentStep - 1].classList.add('completed');
+                }
+                
+                if (currentStep < steps.length) {
+                    steps[currentStep].classList.add('active');
+                    currentStep++;
+                } else {
+                    currentStep = 0;
+                    steps.forEach(step => {
+                        step.classList.remove('active', 'completed');
+                    });
+                }
+            }, 1200);
+        }
+
+        function stopLoadingAnimation() {
+            if (loadingInterval) {
+                clearInterval(loadingInterval);
+                loadingInterval = null;
+            }
+            const steps = document.querySelectorAll('.loading-step');
+            steps.forEach(step => {
+                step.classList.remove('active');
+                step.classList.add('completed');
+            });
+        }
+
+        // Scroll progress indicator
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scrollProgress').style.width = scrolled + '%';
+
+            // Show/hide floating nav
+            const results = document.getElementById('results');
+            const floatingNav = document.getElementById('floatingNav');
+            if (results.classList.contains('active') && winScroll > 300) {
+                floatingNav.classList.add('visible');
+            } else {
+                floatingNav.classList.remove('visible');
+            }
+
+            // Highlight active section
+            const sections = document.querySelectorAll('.section[id], .verdict[id]');
+            const navItems = document.querySelectorAll('.floating-nav-item');
+            
+            sections.forEach((section, index) => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 150 && rect.bottom >= 150) {
+                    navItems.forEach(item => item.classList.remove('active'));
+                    const activeNav = document.querySelector(`a[href="#${section.id}"]`);
+                    if (activeNav) activeNav.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll for nav items
+        document.querySelectorAll('.floating-nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = item.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        document.getElementById('evaluateBtn').addEventListener('click', evaluateIdea);
+        document.getElementById('askFollowUpBtn').addEventListener('click', askFollowUp);
+        document.getElementById('newIdeaBtn').addEventListener('click', resetForm);
+
+        async function evaluateIdea() {
+            const idea = document.getElementById('ideaInput').value.trim();
+            
+            if (!idea) {
+                alert('Please describe your business idea first.');
+                return;
+            }
+
+            currentIdea = idea;
+            conversationHistory = [];
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.remove('active');
+            
+            const dynamicSections = resultsDiv.querySelectorAll('.section:not([id])');
+            dynamicSections.forEach(section => section.remove());
+            
+            document.getElementById('evaluateBtn').disabled = true;
+            document.getElementById('loading').classList.add('active');
+            startLoadingAnimation();
+
+            try {
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ idea })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const analysisText = data.content.find(item => item.type === "text")?.text || "";
+                
+                stopLoadingAnimation();
+                parseAndDisplayAnalysis(analysisText);
+                extractKeyMetrics(analysisText);
+                
+                conversationHistory.push({
+                    role: "user",
+                    content: `Business idea: ${idea}`
+                });
+                conversationHistory.push({
+                    role: "assistant",
+                    content: analysisText
+                });
+
+                setTimeout(() => {
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+
+            } catch (error) {
+                console.error("Error:", error);
+                stopLoadingAnimation();
+                alert("Failed to analyze the idea: " + error.message);
+            } finally {
+                document.getElementById('evaluateBtn').disabled = false;
+                document.getElementById('loading').classList.remove('active');
+            }
+        }
+
+        function parseAndDisplayAnalysis(text) {
+            const sections = {
+                restatement: extractSection(text, /(?:##\s*)?1\.\s*RESTATEMENT/i, /(?:##\s*)?2\.\s*USE CASE/i),
+                useCases: extractSection(text, /(?:##\s*)?2\.\s*USE CASE/i, /(?:##\s*)?3\.\s*VALUE PROP/i),
+                valueProps: extractSection(text, /(?:##\s*)?3\.\s*VALUE PROP/i, /(?:##\s*)?4\.\s*MARKET/i),
+                market: extractSection(text, /(?:##\s*)?4\.\s*MARKET/i, /(?:##\s*)?5\.\s*COMPETITIVE/i),
+                similar: extractSection(text, /(?:##\s*)?5\.\s*COMPETITIVE/i, /(?:##\s*)?6\.\s*HISTORICAL/i),
+                failures: extractSection(text, /(?:##\s*)?6\.\s*HISTORICAL/i, /(?:##\s*)?7\.\s*BUSINESS MODEL/i),
+                businessModel: extractSection(text, /(?:##\s*)?7\.\s*BUSINESS MODEL/i, /(?:##\s*)?8\.\s*EXECUTION/i),
+                execution: extractSection(text, /(?:##\s*)?8\.\s*EXECUTION/i, /(?:##\s*)?9\.\s*FOUNDER/i),
+                skills: extractSection(text, /(?:##\s*)?9\.\s*FOUNDER/i, /(?:##\s*)?10\.\s*WHY THIS MIGHT FAIL/i),
+                fail: extractSection(text, /(?:##\s*)?10\.\s*WHY THIS MIGHT FAIL/i, /(?:##\s*)?11\.\s*WHY THIS MIGHT SUCCEED/i),
+                succeed: extractSection(text, /(?:##\s*)?11\.\s*WHY THIS MIGHT SUCCEED/i, /(?:##\s*)?12\.\s*MOAT/i),
+                moat: extractSection(text, /(?:##\s*)?12\.\s*MOAT/i, /(?:##\s*)?13\.\s*GO-TO-MARKET/i),
+                gtm: extractSection(text, /(?:##\s*)?13\.\s*GO-TO-MARKET/i, /(?:##\s*)?14\.\s*HONEST VERDICT/i),
+                verdict: extractSection(text, /(?:##\s*)?14\.\s*HONEST VERDICT/i, /(?:##\s*)?15\.\s*IMPROVEMENT/i),
+                improvements: extractSection(text, /(?:##\s*)?15\.\s*IMPROVEMENT/i, /(?:##\s*)?16\.\s*FOLLOW/i),
+                followup: extractSection(text, /(?:##\s*)?16\.\s*FOLLOW/i, null)
+            };
+
+            const resultsDiv = document.getElementById('results');
+            
+            const restatementDiv = document.createElement('div');
+            restatementDiv.className = 'section';
+            restatementDiv.innerHTML = `
+                <div class="section-header">
+                    <span class="section-icon">📋</span>
+                    <h2>Idea Restatement</h2>
+                </div>
+                <div class="section-content">${formatContent(sections.restatement)}</div>
+            `;
+            resultsDiv.insertBefore(restatementDiv, document.getElementById('useCasesSection'));
+
+            document.getElementById('useCasesContent').innerHTML = formatContent(sections.useCases);
+            document.getElementById('valuePropsContent').innerHTML = formatContent(sections.valueProps);
+            
+            const marketDiv = document.createElement('div');
+            marketDiv.className = 'section';
+            marketDiv.id = 'marketSection';
+            marketDiv.innerHTML = `
+                <div class="section-header">
+                    <span class="section-icon">📊</span>
+                    <h2>Market & Opportunity</h2>
+                </div>
+                <div class="section-content">${formatContent(sections.market)}</div>
+            `;
+            document.getElementById('valuePropsSection').after(marketDiv);
+            
+            document.getElementById('similarContent').innerHTML = formatContent(sections.similar);
+            document.getElementById('failuresContent').innerHTML = formatContent(sections.failures);
+            document.getElementById('downsidesContent').innerHTML = formatContent(sections.businessModel);
+            
+            const executionDiv = document.createElement('div');
+            executionDiv.className = 'section';
+            executionDiv.innerHTML = `
+                <div class="section-header">
+                    <span class="section-icon">⚙️</span>
+                    <h2>Execution Complexity</h2>
+                </div>
+                <div class="section-content">${formatContent(sections.execution)}</div>
+            `;
+            document.getElementById('downsidesSection').after(executionDiv);
+            
+            document.getElementById('skillsContent').innerHTML = formatContent(sections.skills);
+            document.getElementById('failContent').innerHTML = formatContent(sections.fail);
+            document.getElementById('succeedContent').innerHTML = formatContent(sections.succeed);
+            
+            const moatDiv = document.createElement('div');
+            moatDiv.className = 'section';
+            moatDiv.innerHTML = `
+                <div class="section-header">
+                    <span class="section-icon">🏰</span>
+                    <h2>Moat & Defensibility</h2>
+                </div>
+                <div class="section-content">${formatContent(sections.moat)}</div>
+            `;
+            document.getElementById('succeedSection').after(moatDiv);
+            
+            const gtmDiv = document.createElement('div');
+            gtmDiv.className = 'section';
+            gtmDiv.innerHTML = `
+                <div class="section-header">
+                    <span class="section-icon">🚀</span>
+                    <h2>Go-To-Market Strategy</h2>
+                </div>
+                <div class="section-content">${formatContent(sections.gtm)}</div>
+            `;
+            moatDiv.after(gtmDiv);
+            
+            document.getElementById('verdictContent').innerHTML = formatContent(sections.verdict);
+            
+            const improvementsDiv = document.createElement('div');
+            improvementsDiv.className = 'section';
+            improvementsDiv.innerHTML = `
+                <div class="section-header">
+                    <span class="section-icon">💡</span>
+                    <h2>Improvement Suggestions</h2>
+                </div>
+                <div class="section-content">${formatContent(sections.improvements)}</div>
+            `;
+            document.getElementById('verdictSection').after(improvementsDiv);
+            
+            const followupDiv = document.createElement('div');
+            followupDiv.className = 'section';
+            followupDiv.innerHTML = `
+                <div class="section-header">
+                    <span class="section-icon">❓</span>
+                    <h2>Critical Follow-Up Questions</h2>
+                </div>
+                <div class="section-content">${formatContent(sections.followup)}</div>
+            `;
+            improvementsDiv.after(followupDiv);
+
+            resultsDiv.classList.add('active');
+        }
+
+        function extractKeyMetrics(text) {
+            // Extract verdict
+            const verdictMatch = text.match(/(?:PASS|WEAK MAYBE|STRONG MAYBE|INVESTABLE|HIGHLY COMPELLING)/i);
+            let verdictClass = 'pass';
+            let verdictText = 'PASS';
+            
+            if (verdictMatch) {
+                verdictText = verdictMatch[0].toUpperCase();
+                verdictClass = verdictText.toLowerCase().replace(/ /g, '-');
+            }
+
+            // Extract market size
+            let marketSize = 'Not specified';
+            const tamMatch = text.match(/TAM[:\s]+.*?(\$[\d.]+[BMK])/i);
+            if (tamMatch) {
+                marketSize = tamMatch[1];
+            }
+
+            // Extract primary risk
+            let primaryRisk = 'Multiple factors';
+            const riskSection = extractSection(text, /WHY THIS MIGHT FAIL/i, /WHY THIS MIGHT SUCCEED/i);
+            if (riskSection) {
+                const firstRisk = riskSection.split('\n').find(line => line.trim().match(/^[-•*1-9]/));
+                if (firstRisk) {
+                    primaryRisk = firstRisk.replace(/^[-•*1-9.)\s]+/, '').substring(0, 50) + '...';
+                }
+            }
+
+            // Update metrics
+            document.getElementById('metricVerdict').textContent = verdictText;
+            document.getElementById('metricMarket').textContent = marketSize;
+            document.getElementById('metricRisk').textContent = primaryRisk;
+            document.getElementById('keyMetrics').style.display = 'grid';
+
+            // Add verdict stamp
+            const verdictContent = document.getElementById('verdictContent');
+            const stampHTML = `<div class="verdict-stamp"><div class="verdict-decision ${verdictClass}">${verdictText}</div></div>`;
+            verdictContent.innerHTML = stampHTML + verdictContent.innerHTML;
+
+            // Trigger confetti for highly compelling
+            if (verdictClass === 'highly-compelling') {
+                triggerConfetti();
+            }
+        }
+
+        function triggerConfetti() {
+            const colors = ['#D4AF37', '#C41E3A', '#00ff88', '#F5F5DC'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-10px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 30);
+            }
+        }
+
+        function extractSection(text, startPattern, endPattern) {
+            const startMatch = text.search(startPattern);
+            if (startMatch === -1) return "";
+
+            let content = text.substring(startMatch);
+            
+            if (endPattern) {
+                const endMatch = content.search(endPattern);
+                if (endMatch !== -1) {
+                    content = content.substring(0, endMatch);
+                }
+            }
+
+            content = content.replace(/^##\s*[0-9]+\.\s*[A-Z\s&\-()]+/i, '').trim();
+            content = content.replace(/^[0-9]+\.\s*[A-Z\s&\-()]+:/i, '').trim();
+            
+            return content;
+        }
+
+        function formatContent(content) {
+            if (!content) return "<p>Analysis not available for this section.</p>";
+            
+            content = content
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            
+            const lines = content.split('\n').filter(line => line.trim());
+            let formatted = '';
+            let inList = false;
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                if (line.match(/^[-•*]\s/)) {
+                    if (!inList) {
+                        formatted += '<ul>';
+                        inList = true;
+                    }
+                    formatted += `<li>${line.replace(/^[-•*]\s*/, '')}</li>`;
+                }
+                else if (line.match(/^\d+\.\s/)) {
+                    if (!inList) {
+                        formatted += '<ul>';
+                        inList = true;
+                    }
+                    formatted += `<li>${line.replace(/^\d+\.\s*/, '')}</li>`;
+                }
+                else if (line.includes(':') && line.split(':')[0].length < 50) {
+                    if (inList) {
+                        formatted += '</ul>';
+                        inList = false;
+                    }
+                    const [heading, ...rest] = line.split(':');
+                    formatted += `<p><strong>${heading}:</strong> ${rest.join(':')}</p>`;
+                }
+                else {
+                    if (inList) {
+                        formatted += '</ul>';
+                        inList = false;
+                    }
+                    if (line.length > 0) {
+                        formatted += `<p>${line}</p>`;
+                    }
+                }
+            }
+            
+            if (inList) {
+                formatted += '</ul>';
+            }
+            
+            return formatted || "<p>Analysis not available for this section.</p>";
+        }
+
+        async function askFollowUp() {
+            const question = document.getElementById('followUpInput').value.trim();
+            
+            if (!question) {
+                alert('Please enter a question.');
+                return;
+            }
+
+            document.getElementById('askFollowUpBtn').disabled = true;
+
+            conversationHistory.push({
+                role: "user",
+                content: question
+            });
+
+            try {
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ conversationHistory })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const answer = data.content.find(item => item.type === "text")?.text || "";
+                
+                conversationHistory.push({
+                    role: "assistant",
+                    content: answer
+                });
+
+                const historyDiv = document.getElementById('conversationHistory');
+                const conversationItem = document.createElement('div');
+                conversationItem.className = 'conversation-item';
+                conversationItem.innerHTML = `<strong>Q: ${question}</strong><p>${answer}</p>`;
+                historyDiv.appendChild(conversationItem);
+
+                document.getElementById('followUpInput').value = '';
+
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Failed to get answer: " + error.message);
+            } finally {
+                document.getElementById('askFollowUpBtn').disabled = false;
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('ideaInput').value = '';
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('keyMetrics').style.display = 'none';
+            document.getElementById('conversationHistory').innerHTML = '';
+            document.getElementById('floatingNav').classList.remove('visible');
+            conversationHistory = [];
+            currentIdea = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('ideaInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                evaluateIdea();
+            }
+        });
+
+        document.getElementById('followUpInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                askFollowUp();
+            }
+        });
+    </script>
+</body>
+</html>
