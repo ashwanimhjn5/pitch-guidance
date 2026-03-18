@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -67,7 +68,462 @@
             padding: 0 20px;
         }
 
-        /* Header */
+        /* Top Navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--charcoal);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--cream);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--silver);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--gold);
+        }
+
+        .nav-link.active {
+            color: var(--gold);
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blood-red), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: var(--off-black);
+            border: 1px solid var(--charcoal);
+            border-radius: 8px;
+            padding: 0.5rem;
+            min-width: 200px;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            padding: 0.75rem 1rem;
+            color: var(--silver);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown-item:hover {
+            background: var(--charcoal);
+            color: var(--gold);
+        }
+
+        /* Auth Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .auth-modal {
+            background: var(--off-black);
+            border: 1px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--silver);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--charcoal);
+            color: var(--blood-red);
+        }
+
+        .auth-modal h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--cream);
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-modal p {
+            color: #999;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--silver);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--deep-black);
+            border: 2px solid var(--charcoal);
+            border-radius: 8px;
+            color: var(--cream);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--blood-red);
+            box-shadow: 0 0 0 3px rgba(255, 51, 102, 0.1);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--blood-red), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 51, 102, 0.4);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #999;
+        }
+
+        .auth-toggle a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--blood-red);
+            border-radius: 8px;
+            padding: 0.875rem;
+            color: var(--blood-red);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 0.875rem;
+            color: #00ff88;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            font-style: italic;
+            color: var(--cream);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .dashboard-actions {
+            margin-bottom: 3rem;
+        }
+
+        .btn-new-idea {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--blood-red), var(--accent-purple));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(255, 51, 102, 0.3);
+        }
+
+        .btn-new-idea:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(255, 51, 102, 0.5);
+        }
+
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .idea-card {
+            background: var(--off-black);
+            border: 1px solid var(--charcoal);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .idea-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(255, 184, 0, 0.2);
+        }
+
+        .idea-card-verdict {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .verdict-pass { background: rgba(255, 107, 107, 0.2); color: #ff6b6b; }
+        .verdict-needs-refinement { background: rgba(255, 169, 77, 0.2); color: #ffa94d; }
+        .verdict-promising { background: rgba(255, 184, 0, 0.2); color: var(--gold); }
+        .verdict-strong-opportunity { background: rgba(81, 207, 102, 0.2); color: #51cf66; }
+        .verdict-highly-compelling { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+
+        .idea-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--cream);
+            margin-bottom: 0.75rem;
+            padding-right: 100px;
+        }
+
+        .idea-card-description {
+            color: #999;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .idea-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--charcoal);
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .idea-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            background: var(--charcoal);
+            color: var(--silver);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-small:hover {
+            background: var(--gold);
+            color: var(--deep-black);
+        }
+
+        .btn-small.danger:hover {
+            background: var(--blood-red);
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--cream);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #999;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Hero - Add padding for fixed nav */
         .hero {
             min-height: 100vh;
             display: flex;
@@ -76,7 +532,7 @@
             align-items: center;
             text-align: center;
             position: relative;
-            padding: 60px 20px;
+            padding: 100px 20px 60px;
             background: 
                 radial-gradient(circle at 20% 50%, rgba(255, 51, 102, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(255, 184, 0, 0.08) 0%, transparent 50%);
@@ -128,6 +584,19 @@
                 transform: translateY(0);
             }
         }
+
+        /* Main content area */
+        .main-content {
+            display: block;
+        }
+
+        .main-content.hidden {
+            display: none;
+        }
+
+        /* Rest of your existing styles... */
+        /* (Keep all the existing CSS from the previous index-improved.html) */
+        /* I'll add a marker here - paste the rest of the CSS below */
 
         /* Input Section */
         .pitch-section {
@@ -960,6 +1429,7 @@
         @media (max-width: 768px) {
             .hero {
                 min-height: 80vh;
+                padding-top: 80px;
             }
 
             .pitch-section {
@@ -981,185 +1451,310 @@
             .key-metrics {
                 grid-template-columns: 1fr;
             }
+
+            .ideas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .nav-link {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a class="nav-logo" onclick="showHome()">Pitch Guidance</a>
+            <div class="nav-links">
+                <a id="navHome" class="nav-link active" onclick="showHome()">Home</a>
+                <a id="navDashboard" class="nav-link" onclick="showDashboard()" style="display: none;">My Ideas</a>
+                <a id="navLogin" class="nav-link" onclick="showAuthModal('login')">Login</a>
+                <div id="userMenu" class="user-menu" style="display: none;">
+                    <div class="user-avatar" onclick="toggleUserDropdown()">
+                        <span id="userInitials">U</span>
+                    </div>
+                    <div id="userDropdown" class="user-dropdown">
+                        <div class="user-dropdown-item" onclick="showDashboard()">My Ideas</div>
+                        <div class="user-dropdown-item" onclick="logout()">Logout</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <div class="scroll-indicator">
         <div class="scroll-progress" id="scrollProgress"></div>
     </div>
 
-    <div class="container">
-        <section class="hero">
-            <h1 class="hero-title">Pitch Guidance</h1>
-            <p class="hero-subtitle">Smart Startup Evaluation</p>
-            <p class="hero-description">
-                Get comprehensive feedback on your startup idea from decades of VC insights. 
-                We'll help you identify <span class="blood-accent">strengths</span>, spot <span class="blood-accent">risks</span>, 
-                and refine your approach so you can build with confidence.
-            </p>
-        </section>
-
-        <section class="pitch-section">
-            <label class="pitch-label" for="ideaInput">Share Your Idea</label>
-            <textarea 
-                id="ideaInput" 
-                class="pitch-input" 
-                placeholder="Tell us about your startup idea. What problem are you solving? Who's your target customer? What makes your approach unique? The more detail you share, the better feedback we can provide."
-            ></textarea>
-            <button id="evaluateBtn" class="submit-btn">
-                <span>Get Feedback</span>
-            </button>
-        </section>
-
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Analyzing your idea with AI-powered insights...</p>
-            <div class="loading-steps" id="loadingSteps">
-                <div class="loading-step" data-step="1">
-                    <span class="loading-step-icon">🎯</span>
-                    <span class="loading-step-text">Analyzing use cases and target market</span>
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal-overlay">
+        <div class="auth-modal">
+            <button class="modal-close" onclick="closeAuthModal()">×</button>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <h2>Welcome Back</h2>
+                <p>Login to access your saved ideas and evaluations</p>
+                
+                <div id="loginError" class="error-message" style="display: none;"></div>
+                
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="auth-btn" id="loginBtn">
+                        Login
+                    </button>
+                </form>
+                
+                <div class="auth-toggle">
+                    Don't have an account? <a onclick="switchToSignup()">Sign up</a>
                 </div>
-                <div class="loading-step" data-step="2">
-                    <span class="loading-step-icon">💎</span>
-                    <span class="loading-step-text">Evaluating value proposition</span>
-                </div>
-                <div class="loading-step" data-step="3">
-                    <span class="loading-step-icon">📊</span>
-                    <span class="loading-step-text">Calculating market size (TAM/SAM/SOM)</span>
-                </div>
-                <div class="loading-step" data-step="4">
-                    <span class="loading-step-icon">🏢</span>
-                    <span class="loading-step-text">Researching competitive landscape</span>
-                </div>
-                <div class="loading-step" data-step="5">
-                    <span class="loading-step-icon">💀</span>
-                    <span class="loading-step-text">Pattern matching similar successes & failures</span>
-                </div>
-                <div class="loading-step" data-step="6">
-                    <span class="loading-step-icon">💰</span>
-                    <span class="loading-step-text">Assessing business model viability</span>
-                </div>
-                <div class="loading-step" data-step="7">
-                    <span class="loading-step-icon">⚙️</span>
-                    <span class="loading-step-text">Evaluating execution complexity</span>
-                </div>
-                <div class="loading-step" data-step="8">
-                    <span class="loading-step-icon">⚖️</span>
-                    <span class="loading-step-text">Generating final verdict</span>
+            </div>
+            
+            <!-- Signup Form -->
+            <div id="signupForm" class="auth-form" style="display: none;">
+                <h2>Create Account</h2>
+                <p>Start saving and tracking your startup ideas</p>
+                
+                <div id="signupError" class="error-message" style="display: none;"></div>
+                <div id="signupSuccess" class="success-message" style="display: none;"></div>
+                
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="signupPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="auth-btn" id="signupBtn">
+                        Create Account
+                    </button>
+                </form>
+                
+                <div class="auth-toggle">
+                    Already have an account? <a onclick="switchToLogin()">Login</a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="results" id="results">
-            <!-- Key Metrics Overview -->
-            <div class="key-metrics" id="keyMetrics" style="display: none;">
-                <div class="metric-card highlight">
-                    <div class="metric-label">Investment Decision</div>
-                    <div class="metric-value" id="metricVerdict">—</div>
-                    <div class="metric-description">Final recommendation</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Market Size</div>
-                    <div class="metric-value" id="metricMarket">—</div>
-                    <div class="metric-description">TAM estimate</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Risk Level</div>
-                    <div class="metric-value" id="metricRisk">—</div>
-                    <div class="metric-description">Primary concern</div>
-                </div>
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>My Ideas</h1>
+                <p>Your saved startup ideas and evaluations</p>
             </div>
-
-            <div class="section" id="useCasesSection">
-                <div class="section-header">
-                    <span class="section-icon">🎯</span>
-                    <h2>Use Case Evaluation</h2>
-                </div>
-                <div class="section-content" id="useCasesContent"></div>
+            
+            <div class="dashboard-actions">
+                <button class="btn-new-idea" onclick="showHome()">
+                    + Evaluate New Idea
+                </button>
             </div>
-
-            <div class="section" id="valuePropsSection">
-                <div class="section-header">
-                    <span class="section-icon">💎</span>
-                    <h2>Value Proposition</h2>
-                </div>
-                <div class="section-content" id="valuePropsContent"></div>
+            
+            <div id="ideasGrid" class="ideas-grid">
+                <!-- Ideas will be loaded here -->
             </div>
-
-            <div class="section" id="similarSection">
-                <div class="section-header">
-                    <span class="section-icon">🏢</span>
-                    <h2>Competitive Landscape</h2>
-                </div>
-                <div class="section-content" id="similarContent"></div>
-            </div>
-
-            <div class="section" id="failuresSection">
-                <div class="section-header">
-                    <span class="section-icon">💀</span>
-                    <h2>Historical Patterns</h2>
-                </div>
-                <div class="section-content" id="failuresContent"></div>
-            </div>
-
-            <div class="section" id="downsidesSection">
-                <div class="section-header">
-                    <span class="section-icon">💰</span>
-                    <h2>Business Model Viability</h2>
-                </div>
-                <div class="section-content" id="downsidesContent"></div>
-            </div>
-
-            <div class="section" id="skillsSection">
-                <div class="section-header">
-                    <span class="section-icon">🛠️</span>
-                    <h2>Founder-Market Fit</h2>
-                </div>
-                <div class="section-content" id="skillsContent"></div>
-            </div>
-
-            <div class="section" id="failSection">
-                <div class="section-header">
-                    <span class="section-icon">❌</span>
-                    <h2>Why This Might Fail</h2>
-                </div>
-                <div class="section-content" id="failContent"></div>
-            </div>
-
-            <div class="section" id="succeedSection">
-                <div class="section-header">
-                    <span class="section-icon">✅</span>
-                    <h2>Why This Might Succeed</h2>
-                </div>
-                <div class="section-content" id="succeedContent"></div>
-            </div>
-
-            <div class="verdict" id="verdictSection">
-                <h2>📊 Our Assessment</h2>
-                <div class="verdict-content" id="verdictContent"></div>
-            </div>
-
-            <div class="follow-up">
-                <h3>Want to Explore Further?</h3>
-                <input 
-                    type="text" 
-                    id="followUpInput" 
-                    class="follow-up-input" 
-                    placeholder="Ask follow-up questions about your evaluation..."
-                >
-                <div class="action-buttons">
-                    <button id="askFollowUpBtn" class="btn-primary">Ask Question</button>
-                    <button id="newIdeaBtn" class="btn-secondary">Evaluate New Idea</button>
-                </div>
-                <div class="conversation-history" id="conversationHistory"></div>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-state-icon">💡</div>
+                <h3>No Ideas Yet</h3>
+                <p>Start by evaluating your first startup idea!</p>
+                <button class="btn-new-idea" onclick="showHome()">
+                    Evaluate Your First Idea
+                </button>
             </div>
         </div>
+    </div>
 
-        <footer class="footer">
-            <p>Pitch Guidance • Powered by Experience</p>
-            <p>Thoughtful analysis to help you build better. Not investment advice.</p>
-        </footer>
+    <!-- Main Content (Home/Evaluation View) -->
+    <div id="mainContent" class="main-content">
+        <div class="container">
+            <section class="hero">
+                <h1 class="hero-title">Pitch Guidance</h1>
+                <p class="hero-subtitle">Smart Startup Evaluation • Powered by AI</p>
+                <p class="hero-description">
+                    Get comprehensive feedback on your startup idea from an AI trained on decades of VC insights. 
+                    We'll help you identify <span class="blood-accent">strengths</span>, spot <span class="blood-accent">risks</span>, 
+                    and refine your approach—so you can build with confidence.
+                </p>
+            </section>
+
+            <section class="pitch-section">
+                <label class="pitch-label" for="ideaInput">Share Your Idea</label>
+                <textarea 
+                    id="ideaInput" 
+                    class="pitch-input" 
+                    placeholder="Tell us about your startup idea. What problem are you solving? Who's your target customer? What makes your approach unique? The more detail you share, the better feedback we can provide."
+                ></textarea>
+                <button id="evaluateBtn" class="submit-btn">
+                    <span>Get Feedback</span>
+                </button>
+            </section>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Analyzing your idea with AI-powered insights...</p>
+                <div class="loading-steps" id="loadingSteps">
+                    <div class="loading-step" data-step="1">
+                        <span class="loading-step-icon">🎯</span>
+                        <span class="loading-step-text">Analyzing use cases and target market</span>
+                    </div>
+                    <div class="loading-step" data-step="2">
+                        <span class="loading-step-icon">💎</span>
+                        <span class="loading-step-text">Evaluating value proposition</span>
+                    </div>
+                    <div class="loading-step" data-step="3">
+                        <span class="loading-step-icon">📊</span>
+                        <span class="loading-step-text">Calculating market size (TAM/SAM/SOM)</span>
+                    </div>
+                    <div class="loading-step" data-step="4">
+                        <span class="loading-step-icon">🏢</span>
+                        <span class="loading-step-text">Researching competitive landscape</span>
+                    </div>
+                    <div class="loading-step" data-step="5">
+                        <span class="loading-step-icon">💀</span>
+                        <span class="loading-step-text">Pattern matching similar successes & failures</span>
+                    </div>
+                    <div class="loading-step" data-step="6">
+                        <span class="loading-step-icon">💰</span>
+                        <span class="loading-step-text">Assessing business model viability</span>
+                    </div>
+                    <div class="loading-step" data-step="7">
+                        <span class="loading-step-icon">⚙️</span>
+                        <span class="loading-step-text">Evaluating execution complexity</span>
+                    </div>
+                    <div class="loading-step" data-step="8">
+                        <span class="loading-step-icon">⚖️</span>
+                        <span class="loading-step-text">Generating final verdict</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results" id="results">
+                <!-- Key Metrics Overview -->
+                <div class="key-metrics" id="keyMetrics" style="display: none;">
+                    <div class="metric-card highlight">
+                        <div class="metric-label">Investment Decision</div>
+                        <div class="metric-value" id="metricVerdict">—</div>
+                        <div class="metric-description">Final recommendation</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Market Size</div>
+                        <div class="metric-value" id="metricMarket">—</div>
+                        <div class="metric-description">TAM estimate</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Risk Level</div>
+                        <div class="metric-value" id="metricRisk">—</div>
+                        <div class="metric-description">Primary concern</div>
+                    </div>
+                </div>
+
+                <div class="section" id="useCasesSection">
+                    <div class="section-header">
+                        <span class="section-icon">🎯</span>
+                        <h2>Use Case Evaluation</h2>
+                    </div>
+                    <div class="section-content" id="useCasesContent"></div>
+                </div>
+
+                <div class="section" id="valuePropsSection">
+                    <div class="section-header">
+                        <span class="section-icon">💎</span>
+                        <h2>Value Proposition</h2>
+                    </div>
+                    <div class="section-content" id="valuePropsContent"></div>
+                </div>
+
+                <div class="section" id="similarSection">
+                    <div class="section-header">
+                        <span class="section-icon">🏢</span>
+                        <h2>Competitive Landscape</h2>
+                    </div>
+                    <div class="section-content" id="similarContent"></div>
+                </div>
+
+                <div class="section" id="failuresSection">
+                    <div class="section-header">
+                        <span class="section-icon">💀</span>
+                        <h2>Historical Patterns</h2>
+                    </div>
+                    <div class="section-content" id="failuresContent"></div>
+                </div>
+
+                <div class="section" id="downsidesSection">
+                    <div class="section-header">
+                        <span class="section-icon">💰</span>
+                        <h2>Business Model Viability</h2>
+                    </div>
+                    <div class="section-content" id="downsidesContent"></div>
+                </div>
+
+                <div class="section" id="skillsSection">
+                    <div class="section-header">
+                        <span class="section-icon">🛠️</span>
+                        <h2>Founder-Market Fit</h2>
+                    </div>
+                    <div class="section-content" id="skillsContent"></div>
+                </div>
+
+                <div class="section" id="failSection">
+                    <div class="section-header">
+                        <span class="section-icon">❌</span>
+                        <h2>Why This Might Fail</h2>
+                    </div>
+                    <div class="section-content" id="failContent"></div>
+                </div>
+
+                <div class="section" id="succeedSection">
+                    <div class="section-header">
+                        <span class="section-icon">✅</span>
+                        <h2>Why This Might Succeed</h2>
+                    </div>
+                    <div class="section-content" id="succeedContent"></div>
+                </div>
+
+                <div class="verdict" id="verdictSection">
+                    <h2>📊 Our Assessment</h2>
+                    <div class="verdict-content" id="verdictContent"></div>
+                </div>
+
+                <div class="follow-up">
+                    <h3>Want to Explore Further?</h3>
+                    <input 
+                        type="text" 
+                        id="followUpInput" 
+                        class="follow-up-input" 
+                        placeholder="Ask follow-up questions about your evaluation..."
+                    >
+                    <div class="action-buttons">
+                        <button id="askFollowUpBtn" class="btn-primary">Ask Question</button>
+                        <button id="newIdeaBtn" class="btn-secondary">Evaluate New Idea</button>
+                    </div>
+                    <div class="conversation-history" id="conversationHistory"></div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p>Pitch Guidance • Powered by Claude AI</p>
+                <p>Thoughtful analysis to help you build better. Not investment advice.</p>
+            </footer>
+        </div>
     </div>
 
     <!-- Floating Navigation -->
@@ -1178,10 +1773,357 @@
     </nav>
 
     <script>
+        // Initialize Supabase - THIS WILL BE CONFIGURED FROM ENV VARS
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Will be replaced
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Will be replaced
+        
+        // Note: These will be injected at build time or you'll need to configure them
+        // For now, we'll add them as script configuration
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentUser = null;
+        let currentIdeaId = null;
+        let currentEvaluationId = null;
         let conversationHistory = [];
         let currentIdea = '';
         let loadingInterval = null;
 
+        // Check if user is logged in on page load
+        checkAuth();
+
+        async function checkAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                updateUIForAuthState(true);
+            }
+        }
+
+        function updateUIForAuthState(isLoggedIn) {
+            const loginBtn = document.getElementById('navLogin');
+            const dashboardLink = document.getElementById('navDashboard');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (isLoggedIn && currentUser) {
+                loginBtn.style.display = 'none';
+                dashboardLink.style.display = 'block';
+                userMenu.style.display = 'block';
+                
+                // Set user initials
+                const email = currentUser.email;
+                const initials = email.substring(0, 2).toUpperCase();
+                document.getElementById('userInitials').textContent = initials;
+            } else {
+                loginBtn.style.display = 'block';
+                dashboardLink.style.display = 'none';
+                userMenu.style.display = 'none';
+            }
+        }
+
+        function showAuthModal(mode = 'login') {
+            const modal = document.getElementById('authModal');
+            modal.classList.add('show');
+            
+            if (mode === 'login') {
+                switchToLogin();
+            } else {
+                switchToSignup();
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('show');
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('signupError').style.display = 'none';
+        }
+
+        function switchToLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+        }
+
+        function switchToSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                updateUIForAuthState(true);
+                closeAuthModal();
+                
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const signupBtn = document.getElementById('signupBtn');
+            const errorDiv = document.getElementById('signupError');
+            const successDiv = document.getElementById('signupSuccess');
+            
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+                
+                successDiv.textContent = 'Account created! You can now login.';
+                successDiv.style.display = 'block';
+                
+                // Switch to login after 2 seconds
+                setTimeout(() => {
+                    switchToLogin();
+                }, 2000);
+                
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+            } finally {
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Create Account';
+            }
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            updateUIForAuthState(false);
+            showHome();
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+        });
+
+        function showHome() {
+            document.getElementById('dashboardView').classList.remove('active');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('navHome').classList.add('active');
+            document.getElementById('navDashboard').classList.remove('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function showDashboard() {
+            if (!currentUser) {
+                showAuthModal('login');
+                return;
+            }
+            
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('dashboardView').classList.add('active');
+            document.getElementById('navHome').classList.remove('active');
+            document.getElementById('navDashboard').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            await loadUserIdeas();
+        }
+
+        async function loadUserIdeas() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return;
+                
+                const response = await fetch('/api/ideas', {
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load ideas');
+                
+                const ideas = await response.json();
+                displayIdeas(ideas);
+                
+            } catch (error) {
+                console.error('Error loading ideas:', error);
+            }
+        }
+
+        function displayIdeas(ideas) {
+            const grid = document.getElementById('ideasGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (!ideas || ideas.length === 0) {
+                grid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            grid.innerHTML = ideas.map(idea => {
+                const evaluation = idea.evaluations && idea.evaluations[0];
+                const verdict = evaluation?.verdict || 'Not evaluated';
+                const verdictClass = verdict.toLowerCase().replace(/ /g, '-');
+                const date = new Date(idea.created_at).toLocaleDateString();
+                
+                return `
+                    <div class="idea-card" onclick="viewIdea('${idea.id}')">
+                        <div class="idea-card-verdict verdict-${verdictClass}">
+                            ${verdict}
+                        </div>
+                        <div class="idea-card-title">${idea.title}</div>
+                        <div class="idea-card-description">${idea.description}</div>
+                        <div class="idea-card-meta">
+                            <span>📅 ${date}</span>
+                            <span>${evaluation ? '✅ Evaluated' : '⏳ Pending'}</span>
+                        </div>
+                        <div class="idea-card-actions" onclick="event.stopPropagation()">
+                            <button class="btn-small" onclick="viewIdea('${idea.id}')">View</button>
+                            <button class="btn-small danger" onclick="deleteIdea('${idea.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function viewIdea(ideaId) {
+            // Navigate to home and load the idea's evaluation
+            showHome();
+            
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return;
+                
+                const response = await fetch(`/api/ideas/${ideaId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load idea');
+                
+                const idea = await response.json();
+                
+                // Populate the form
+                document.getElementById('ideaInput').value = idea.description;
+                currentIdeaId = idea.id;
+                
+                // If there's an evaluation, display it
+                if (idea.evaluations && idea.evaluations[0]) {
+                    const evaluation = idea.evaluations[0];
+                    currentEvaluationId = evaluation.id;
+                    
+                    // Display the evaluation
+                    parseAndDisplayAnalysis(evaluation.evaluation_text);
+                    extractKeyMetrics(evaluation.evaluation_text);
+                    
+                    // Load conversation history
+                    if (evaluation.conversation_history) {
+                        conversationHistory = [];
+                        const historyDiv = document.getElementById('conversationHistory');
+                        historyDiv.innerHTML = '';
+                        
+                        evaluation.conversation_history.forEach(item => {
+                            conversationHistory.push({
+                                role: item.role,
+                                content: item.content
+                            });
+                            
+                            if (item.role === 'user') {
+                                // Find the corresponding assistant response
+                                const assistantMsg = evaluation.conversation_history.find(
+                                    msg => msg.role === 'assistant' && msg.created_at > item.created_at
+                                );
+                                
+                                if (assistantMsg) {
+                                    const conversationItem = document.createElement('div');
+                                    conversationItem.className = 'conversation-item';
+                                    conversationItem.innerHTML = `
+                                        <strong>Q: ${item.content}</strong>
+                                        <div class="answer-content">${formatAnswerText(assistantMsg.content)}</div>
+                                    `;
+                                    historyDiv.appendChild(conversationItem);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Scroll to results
+                    setTimeout(() => {
+                        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                }
+                
+            } catch (error) {
+                console.error('Error viewing idea:', error);
+                alert('Failed to load idea');
+            }
+        }
+
+        async function deleteIdea(ideaId) {
+            if (!confirm('Are you sure you want to delete this idea? This cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) return;
+                
+                const response = await fetch(`/api/ideas/${ideaId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to delete idea');
+                
+                // Reload the dashboard
+                await loadUserIdeas();
+                
+            } catch (error) {
+                console.error('Error deleting idea:', error);
+                alert('Failed to delete idea');
+            }
+        }
+
+        // Continue with the rest of your existing JavaScript...
+        // (All the evaluation, formatting, and UI code from before)
+        
         // Progressive loading animation
         function startLoadingAnimation() {
             const steps = document.querySelectorAll('.loading-step');
@@ -1366,12 +2308,49 @@
             startLoadingAnimation();
 
             try {
+                // First, save the idea if user is logged in
+                let savedIdeaId = null;
+                if (currentUser) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session) {
+                        const saveResponse = await fetch('/api/ideas', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.access_token}`
+                            },
+                            body: JSON.stringify({
+                                title: idea.substring(0, 100), // First 100 chars as title
+                                description: idea
+                            })
+                        });
+                        
+                        if (saveResponse.ok) {
+                            const savedIdea = await saveResponse.json();
+                            savedIdeaId = savedIdea.id;
+                            currentIdeaId = savedIdeaId;
+                        }
+                    }
+                }
+
+                // Then evaluate
+                const { data: { session } } = await supabase.auth.getSession();
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (session) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                }
+
                 const response = await fetch('/api/evaluate', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ idea })
+                    headers,
+                    body: JSON.stringify({ 
+                        idea,
+                        saveEvaluation: !!savedIdeaId,
+                        ideaId: savedIdeaId
+                    })
                 });
 
                 if (!response.ok) {
@@ -1381,6 +2360,10 @@
 
                 const data = await response.json();
                 const analysisText = data.content.find(item => item.type === "text")?.text || "";
+                
+                if (data.evaluationId) {
+                    currentEvaluationId = data.evaluationId;
+                }
                 
                 stopLoadingAnimation();
                 parseAndDisplayAnalysis(analysisText);
@@ -1408,6 +2391,9 @@
                 document.getElementById('loading').classList.remove('active');
             }
         }
+
+        // The rest continues in next part due to length...
+        // I'll create a second file with the remaining JavaScript functions
 
         function parseAndDisplayAnalysis(text) {
             const sections = {
@@ -1714,11 +2700,18 @@
             });
 
             try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (session) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                }
+
                 const response = await fetch('/api/evaluate', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers,
                     body: JSON.stringify({ conversationHistory })
                 });
 
@@ -1734,6 +2727,39 @@
                     role: "assistant",
                     content: answer
                 });
+
+                // Save conversation if user is logged in and we have an evaluation ID
+                if (currentUser && currentEvaluationId) {
+                    try {
+                        await fetch('/api/conversation', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.access_token}`
+                            },
+                            body: JSON.stringify({
+                                evaluationId: currentEvaluationId,
+                                role: 'user',
+                                content: question
+                            })
+                        });
+                        
+                        await fetch('/api/conversation', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.access_token}`
+                            },
+                            body: JSON.stringify({
+                                evaluationId: currentEvaluationId,
+                                role: 'assistant',
+                                content: answer
+                            })
+                        });
+                    } catch (saveError) {
+                        console.error('Failed to save conversation:', saveError);
+                    }
+                }
 
                 const historyDiv = document.getElementById('conversationHistory');
                 const conversationItem = document.createElement('div');
@@ -1762,6 +2788,8 @@
             document.getElementById('floatingNav').classList.remove('visible');
             conversationHistory = [];
             currentIdea = '';
+            currentIdeaId = null;
+            currentEvaluationId = null;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -1776,6 +2804,16 @@
                 askFollowUp();
             }
         });
+    </script>
+    
+    <!-- Configuration Script - REPLACE THESE VALUES -->
+    <script>
+        // TODO: Replace these with your actual Supabase credentials
+        // You can get these from your Supabase project settings
+        // OR inject them at build time via environment variables
+        
+        // For now, you'll need to manually replace these in the deployed version
+        // OR use a build tool to inject them
     </script>
 </body>
 </html>
