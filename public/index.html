@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pitch Evaluation | Get Smart Feedback on Your Startup Idea</title>
+    <title>Pitch Guidance | Get Smart Feedback on Your Startup Idea</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1586,7 +1586,7 @@
         <div class="container">
             <section class="hero">
                 <h1 class="hero-title">Pitch Guidance</h1>
-                <p class="hero-subtitle">Smart Startup Evaluati</p>
+                <p class="hero-subtitle">Smart Startup Evaluation • Powered by AI</p>
                 <p class="hero-description">
                     Get comprehensive feedback on your startup idea from an AI trained on decades of VC insights. 
                     We'll help you identify <span class="blood-accent">strengths</span>, spot <span class="blood-accent">risks</span>, 
@@ -1773,7 +1773,7 @@
     </nav>
 
     <script>
-                // Fix for onclick handlers - make functions available immediately
+        // === CRITICAL FIX: Make functions globally available immediately ===
         window.showAuthModal = function(mode) {
             const modal = document.getElementById('authModal');
             if (modal) {
@@ -1790,7 +1790,21 @@
         
         window.closeAuthModal = function() {
             const modal = document.getElementById('authModal');
-            if (modal) modal.classList.remove('show');
+            if (modal) {
+                modal.classList.remove('show');
+                document.getElementById('loginError').style.display = 'none';
+                document.getElementById('signupError').style.display = 'none';
+            }
+        };
+        
+        window.switchToLogin = function() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+        };
+        
+        window.switchToSignup = function() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
         };
         
         window.showHome = function() {
@@ -1801,17 +1815,11 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
         
-        window.showDashboard = async function() {
-            if (!window.currentUser) {
-                window.showAuthModal('login');
-                return;
-            }
-            document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('dashboardView').classList.add('active');
-            document.getElementById('navHome').classList.remove('active');
-            document.getElementById('navDashboard').classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.toggleUserDropdown = function() {
+            document.getElementById('userDropdown').classList.toggle('show');
         };
+        // === END CRITICAL FIX ===
+
         // Initialize Supabase - THIS WILL BE CONFIGURED FROM ENV VARS
         const SUPABASE_URL = 'https://hhsnpgmsoktjqvyyryfy.supabase.co'; // Will be replaced
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc25wZ21zb2t0anF2eXlyeWZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTEzMTQsImV4cCI6MjA4OTQyNzMxNH0.99FBDZeJaxehvfTXUn94NMhT72HXOuX2ulj52sB7rLU'; // Will be replaced
