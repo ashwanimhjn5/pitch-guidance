@@ -2465,7 +2465,7 @@ if (document.readyState === 'loading') {
             });
         });
 
-        async function evaluateIdea() {
+        window.evaluateIdea = async function() {
             const idea = document.getElementById('ideaInput').value.trim();
             
             if (!idea) {
@@ -2866,7 +2866,7 @@ if (document.readyState === 'loading') {
             return formatted || "<p>Analysis not available for this section.</p>";
         }
 
-        async function askFollowUp() {
+        window.askFollowUp = async function() {
             const question = document.getElementById('followUpInput').value.trim();
             
             if (!question) {
@@ -2963,7 +2963,8 @@ if (document.readyState === 'loading') {
             }
         }
 
-        function resetForm() {
+        window.resetForm = function() {
+
     document.getElementById('ideaInput').value = '';
     document.getElementById('results').classList.remove('active');
     document.getElementById('keyMetrics').style.display = 'none';
