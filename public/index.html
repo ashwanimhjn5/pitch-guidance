@@ -2465,10 +2465,6 @@ if (document.readyState === 'loading') {
             });
         });
 
-        document.getElementById('evaluateBtn').addEventListener('click', evaluateIdea);
-        document.getElementById('askFollowUpBtn').addEventListener('click', askFollowUp);
-        document.getElementById('newIdeaBtn').addEventListener('click', resetForm);
-
         async function evaluateIdea() {
             const idea = document.getElementById('ideaInput').value.trim();
             
@@ -2968,30 +2964,42 @@ if (document.readyState === 'loading') {
         }
 
         function resetForm() {
-            document.getElementById('ideaInput').value = '';
-            document.getElementById('results').classList.remove('active');
-            document.getElementById('keyMetrics').style.display = 'none';
-            document.getElementById('conversationHistory').innerHTML = '';
-            document.getElementById('floatingNav').classList.remove('visible');
-            conversationHistory = [];
-            currentIdea = '';
-            currentIdeaId = null;
-            currentEvaluationId = null;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    document.getElementById('ideaInput').value = '';
+    document.getElementById('results').classList.remove('active');
+    document.getElementById('keyMetrics').style.display = 'none';
+    document.getElementById('conversationHistory').innerHTML = '';
+    document.getElementById('floatingNav').classList.remove('visible');
+    conversationHistory = [];
+    currentIdea = '';
+    currentIdeaId = null;
+    currentEvaluationId = null;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-        document.getElementById('ideaInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                evaluateIdea();
-            }
-        });
+// Event listeners - only ONE of each!
+document.getElementById('evaluateBtn').addEventListener('click', evaluateIdea);
+document.getElementById('askFollowUpBtn').addEventListener('click', askFollowUp);
+document.getElementById('newIdeaBtn').addEventListener('click', resetForm);
 
-        document.getElementById('followUpInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                askFollowUp();
-            }
-        });
-    </script>
+document.getElementById('ideaInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.ctrlKey) {
+        evaluateIdea();
+    }
+});
+
+document.getElementById('followUpInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        askFollowUp();
+    }
+});
+</script>
+Notice I removed the duplicate ideaInput listener!
+
+🚀 Deploy:
+bashgit add public/index.html
+git commit -m "Fix: Remove duplicate event listeners and reorganize"
+git push origin main
+Wait 2 minutes, then test! It should work now! 🎉
     
     <!-- Configuration Script - REPLACE THESE VALUES -->
     <script>
