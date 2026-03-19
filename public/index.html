@@ -2477,6 +2477,9 @@ if (document.readyState === 'loading') {
                 return;
             }
 
+            const supabase = window.getSupabase();
+
+
             currentIdea = idea;
             conversationHistory = [];
             
@@ -2874,6 +2877,7 @@ if (document.readyState === 'loading') {
                 alert('Please enter a question.');
                 return;
             }
+            const supabase = window.getSupabase();
 
             document.getElementById('askFollowUpBtn').disabled = true;
 
