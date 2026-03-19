@@ -1963,7 +1963,7 @@ if (document.readyState === 'loading') {
         const supabase = window.getSupabase();
         // Note: These will be injected at build time or you'll need to configure them
         // For now, we'll add them as script configuration        
-        let currentUser = null;
+        window.currentUser = null;
         let currentIdeaId = null;
         let currentEvaluationId = null;
         let conversationHistory = [];
@@ -1976,7 +1976,7 @@ if (document.readyState === 'loading') {
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                currentUser = session.user;
+                window.currentUser = session.user;
                 updateUIForAuthState(true);
             }
         }
@@ -1986,13 +1986,13 @@ if (document.readyState === 'loading') {
             const dashboardLink = document.getElementById('navDashboard');
             const userMenu = document.getElementById('userMenu');
             
-            if (isLoggedIn && currentUser) {
+            if (isLoggedIn && window.currentUser) {
                 loginBtn.style.display = 'none';
                 dashboardLink.style.display = 'block';
                 userMenu.style.display = 'block';
                 
                 // Set user initials
-                const email = currentUser.email;
+                const email = window.currentUser.email;
                 const initials = email.substring(0, 2).toUpperCase();
                 document.getElementById('userInitials').textContent = initials;
             } else {
@@ -2049,7 +2049,7 @@ if (document.readyState === 'loading') {
                 
                 if (error) throw error;
                 
-                currentUser = data.user;
+                window.currentUser = data.user;
                 updateUIForAuthState(true);
                 closeAuthModal();
                 
@@ -2103,7 +2103,7 @@ if (document.readyState === 'loading') {
 
         async function logout() {
             await supabase.auth.signOut();
-            currentUser = null;
+            window.currentUser = null;
             updateUIForAuthState(false);
             showHome();
         }
@@ -2465,10 +2465,6 @@ if (document.readyState === 'loading') {
             });
         });
 
-        document.getElementById('evaluateBtn').addEventListener('click', evaluateIdea);
-        document.getElementById('askFollowUpBtn').addEventListener('click', askFollowUp);
-        document.getElementById('newIdeaBtn').addEventListener('click', resetForm);
-
         async function evaluateIdea() {
             const idea = document.getElementById('ideaInput').value.trim();
             
@@ -2496,7 +2492,7 @@ if (document.readyState === 'loading') {
             try {
                 // First, save the idea if user is logged in
                 let savedIdeaId = null;
-                if (currentUser) {
+                if (window.currentUser) {
                     const { data: { session } } = await supabase.auth.getSession();
                     if (session) {
                         const saveResponse = await fetch('/api/ideas', {
@@ -2968,30 +2964,35 @@ if (document.readyState === 'loading') {
         }
 
         function resetForm() {
-            document.getElementById('ideaInput').value = '';
-            document.getElementById('results').classList.remove('active');
-            document.getElementById('keyMetrics').style.display = 'none';
-            document.getElementById('conversationHistory').innerHTML = '';
-            document.getElementById('floatingNav').classList.remove('visible');
-            conversationHistory = [];
-            currentIdea = '';
-            currentIdeaId = null;
-            currentEvaluationId = null;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    document.getElementById('ideaInput').value = '';
+    document.getElementById('results').classList.remove('active');
+    document.getElementById('keyMetrics').style.display = 'none';
+    document.getElementById('conversationHistory').innerHTML = '';
+    document.getElementById('floatingNav').classList.remove('visible');
+    conversationHistory = [];
+    currentIdea = '';
+    currentIdeaId = null;
+    currentEvaluationId = null;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-        document.getElementById('ideaInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                evaluateIdea();
-            }
-        });
+// Event listeners - only ONE of each!
+document.getElementById('evaluateBtn').addEventListener('click', evaluateIdea);
+document.getElementById('askFollowUpBtn').addEventListener('click', askFollowUp);
+document.getElementById('newIdeaBtn').addEventListener('click', resetForm);
 
-        document.getElementById('followUpInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                askFollowUp();
-            }
-        });
-    </script>
+document.getElementById('ideaInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.ctrlKey) {
+        evaluateIdea();
+    }
+});
+
+document.getElementById('followUpInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        askFollowUp();
+    }
+});
+</script>
     
     <!-- Configuration Script - REPLACE THESE VALUES -->
     <script>
